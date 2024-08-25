@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 const PlayButton = ({ bpm, audioSrc } :{bpm:number; audioSrc:string}) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(null);
-  const intervalRef = useRef(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null >(null);
 
   useEffect(() => {
     if (isPlaying) {
@@ -20,11 +20,19 @@ const PlayButton = ({ bpm, audioSrc } :{bpm:number; audioSrc:string}) => {
       }, interval);
     } else {
       // Clear the interval when the sound should stop
-      clearInterval(intervalRef.current);
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }
 
     // Cleanup the interval when the component unmounts or BPM changes
-    return () => clearInterval(intervalRef.current);
+    return () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [bpm, isPlaying]);
 
   useEffect(() => {

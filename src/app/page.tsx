@@ -2,7 +2,7 @@
 import Image from "next/image";
 import PlayButton from "@/components/PlayButton";
 import TapTempo from "@/components/TapTempo";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 
 export default function Home() {
   const [tempo, setTempo] = useState(0);
@@ -12,14 +12,14 @@ export default function Home() {
     setTempo(newTempo);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e :ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value)) {
       setTempo(value);
     }
   };
 
-  const handleAudioChange = (e) => {
+  const handleAudioChange = (e:ChangeEvent<HTMLInputElement>) => {
     setSelectedAudio(e.target.value);
   };
 
@@ -91,7 +91,6 @@ const styles = {
     fontSize: '16px',
     borderRadius: '5px',
     border: '1px solid #ccc',
-    textAlign: 'center',
     width: '150px',
   },
   audioSelector: {

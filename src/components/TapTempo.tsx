@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 
 const TapTempo = ({ onTempoChange }: any) => {
-    const [clickTimes, setClickTimes] = useState([]);
+    const [clickTimes, setClickTimes] = useState<number[]>([]);
   
     const handleClick = () => {
       const now = Date.now();
