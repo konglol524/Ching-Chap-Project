@@ -1,102 +1,119 @@
 "use client"
 import Image from "next/image";
-import PlayButton from "@/components/PlayButton";
-import TapTempo from "@/components/TapTempo";
-import { useState, ChangeEvent } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  ChangeEventHandler,
+} from "react";
 
 export default function Home() {
-  const [tempo, setTempo] = useState(0);
-  const [selectedAudio, setSelectedAudio] = useState('/met1.mp3');
+  const chingRef = useRef<HTMLAudioElement | null>(null);
+  const chapRef = useRef<HTMLAudioElement | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [tap1, setTap1] = useState<number| null>(null);
+  const [tap2, setTap2] = useState<number| null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isChap, setIsChap] = useState(false);
 
-  const handleTempoChange = (newTempo:any) => {
-    setTempo(newTempo);
-  };
-
-  const handleInputChange = (e :ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (!isNaN(value)) {
-      setTempo(value);
+  const play = useCallback(()=>{
+    if(isChap){
+      //Play Chap
+      if (chapRef.current) {
+        chapRef.current.play();
+        console.log('Playing CHAP');
+      }
+      if (chingRef.current) {
+        chingRef.current.pause();
+        chingRef.current.currentTime = 0;
+      }
+    } else {
+      //Play Ching
+      if (chingRef.current) {
+        chingRef.current.play();
+        console.log('Playing CHING');
+      }
+      if (chapRef.current) {
+        chapRef.current.pause();
+        chapRef.current.currentTime = 0;
+      }
     }
-  };
+  }, [isChap]);
 
-  const handleAudioChange = (e:ChangeEvent<HTMLInputElement>) => {
-    setSelectedAudio(e.target.value);
-  };
+  const handleTap = ()=>{
+    // chingRef.current = new Audio('/ching.mp3');
+    if(!isPlaying){
+      if(!isChap){
+        //First press - start timer
+        console.log('first press')
+        setTap1(Date.now());
+        setTap2(null);        
+        play();
+        setIsChap(!isChap);
+      } else {
+        console.log('second press')
+        //Second press - calculate interval and start playing
+        setTap2(Date.now());
+      }
+    }
+      
+  }
+
+  const startChingChap = (interval:number)=>{
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    intervalRef.current = setInterval(() => {
+      play();
+      setIsChap(!isChap);
+    }, interval);
+  } 
+
+  useEffect(() => {
+    if (tap1 !== null && tap2 !== null) {
+      // Calculate interval when tap2 is updated
+      const newInterval = (tap2 - tap1);
+      play();
+      setIsChap(prev => !prev);
+      console.log(newInterval);
+      startChingChap(newInterval);
+      setIsPlaying(true);
+    }
+  }, [tap2]); // Dependency on tap2 to recalculate when it changes
+
+
+  const handleStop = ()=>{
+
+    if (isPlaying){
+      //wait untill the next chap and then stop
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      //set isPlaying to false
+      setIsPlaying(false);
+    }
+    //disable it when isPlaying is false
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-xl"> Ching-Chap </h1>
-      
-      <div style={styles.audioSelector}>
-        <label>
-          <input 
-            type="radio" 
-            value="/met.mp3" 
-            checked={selectedAudio === '/met.mp3'}
-            onChange={handleAudioChange} 
-          />
-          Metronome 1
-        </label>
-        <label>
-          <input 
-            type="radio" 
-            value="/ching.mp3" 
-            checked={selectedAudio === '/ching.mp3'}
-            onChange={handleAudioChange} 
-          />
-          Metronome 2
-        </label>
-        <label>
-          <input 
-            type="radio" 
-            value="/met3.mp3" 
-            checked={selectedAudio === '/met3.mp3'}
-            onChange={handleAudioChange} 
-          />
-          Metronome 3
-        </label>
-      </div>
+      <audio ref={chingRef} src="/ching.mp3" />
+        <audio ref={chapRef} src="/met.mp3" />
+        <div className="flex flex-col items-center"></div> 
+  
+        <button className=" bg-red-500 w-20 h-20 rounded-full"
+          onClick={handleTap}>
+          TAP 
+        </button>
 
-      <PlayButton bpm={tempo} audioSrc={selectedAudio}/>
+        <button className=" bg-red-500 w-20 h-20 rounded-full"
+          onClick={handleStop}>
+          STOP
+        </button>
 
-      <TapTempo onTempoChange={handleTempoChange}/>
+      {/* calculate BPM then display <p>Current Tempo: {tempo} BPM</p> */}
+    </main>      
 
-            {/* Input Field to Manually Set BPM */}
-      <input 
-        type="number" 
-        value={tempo} 
-        onChange={handleInputChange} 
-        placeholder="Enter BPM" 
-        style={styles.input} 
-      />
-
-
-      <p>Current Tempo: {tempo} BPM</p>
-    </main>
   );
-}
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    fontFamily: 'Arial, sans-serif',
-  },
-  input: {
-    padding: '10px',
-    margin: '20px 0',
-    fontSize: '16px',
-    borderRadius: '5px',
-    border: '1px solid #ccc',
-    width: '150px',
-  },
-  audioSelector: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '10px',
-    marginTop: '20px',
-  },
 };
