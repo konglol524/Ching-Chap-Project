@@ -16,10 +16,15 @@ export default function Home() {
   const [length, setLength] = useState<number | null>(0);
 
   // Load audio files into AudioBuffer
-  const loadSound = async (url: string) => {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    return audioContextRef.current?.decodeAudioData(arrayBuffer);
+  const loadSound = async (url: string): Promise<AudioBuffer | null> => {
+    try {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      return await audioContextRef.current?.decodeAudioData(arrayBuffer) ?? null;
+    } catch (error) {
+      console.error("Error loading sound:", error);
+      return null; // Return null if there's an error
+    }
   };
 
   // Initialize the audio context and buffers
