@@ -7,6 +7,7 @@ export default function Home() {
   const chingBufferRef = useRef<AudioBuffer | null>(null);
   const chapBufferRef = useRef<AudioBuffer | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const currentSourceRef = useRef<AudioBufferSourceNode | null>(null); // Ref to keep track of the current playing source
 
   const [tap1, setTap1] = useState<number | null>(null);
   const [tap2, setTap2] = useState<number | null>(null);
@@ -30,7 +31,6 @@ export default function Home() {
   // Initialize the audio context and buffers
   useEffect(() => {
     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    
     // Load ching and chap sounds
     loadSound("/ChingSample.mp3").then((buffer) => {
       chingBufferRef.current = buffer;
@@ -42,20 +42,23 @@ export default function Home() {
 
   // Play sound using Web Audio API
   const playSound = (buffer: AudioBuffer | null) => {
+    if (currentSourceRef.current) {
+      currentSourceRef.current.stop(); // Stop the current playing sound
+    }    
     if (!audioContextRef.current || !buffer) return;
     const source = audioContextRef.current.createBufferSource();
     source.buffer = buffer;
     source.connect(audioContextRef.current.destination);
     source.start(0);
+    currentSourceRef.current = source;
   };
 
   const play = useCallback(() => {
     if (isChap) {
-      if (stopRequested) {
-        stop();
-      } else {
         playSound(chapBufferRef.current); // Play Chap sound
-      }
+        if (stopRequested) {
+          stop();
+        } 
     } else {
       if (stopRequested) {
         stop();
@@ -99,7 +102,7 @@ export default function Home() {
 
   const handleStop = () => {
     if (isPlaying) {
-      setStopRequested(true);
+      setStopRequested((prev)=>(true));
       console.log("Stop requested, will stop after next CHAP");
     }
   };
