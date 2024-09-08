@@ -16,104 +16,110 @@ export default function Home() {
   const [tap2, setTap2] = useState<number| null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isChap, setIsChap] = useState(false);
+  const [stopRequested, setStopRequested] = useState(false);
 
-  const play = useCallback(()=>{
-    if(isChap){
-      //Play Chap
-      if (chapRef.current) {
-        chapRef.current.play();
-        console.log('Playing CHAP');
-      }
-      if (chingRef.current) {
-        chingRef.current.pause();
-        chingRef.current.currentTime = 0;
-      }
+  const play = useCallback(() => {
+    if (isChap) {
+          if (chapRef.current) {
+            chingRef.current?.pause();
+            chapRef.current.currentTime = 0;
+            chapRef.current.play();
+            console.log('Playing CHAP');
+          }
+          if(stopRequested){
+            stop();
+          }
     } else {
-      //Play Ching
-      if (chingRef.current) {
-        chingRef.current.play();
-        console.log('Playing CHING');
+      if (stopRequested) {
+        stop();
+      }  else {
+        if (chingRef.current) {
+          chapRef.current?.pause();
+          chingRef.current.currentTime = 0;
+          chingRef.current.play();
+          console.log('Playing CHING');
+        }        
       }
-      if (chapRef.current) {
-        chapRef.current.pause();
-        chapRef.current.currentTime = 0;
-      }
-    }
-  }, [isChap]);
 
-  const handleTap = ()=>{
-    // chingRef.current = new Audio('/ching.mp3');
-    if(!isPlaying){
-      if(!isChap){
-        //First press - start timer
+    }
+    setIsChap((prev) => !prev);
+  }, [isChap, stopRequested]);
+
+  const handleTap = () => {
+    if (!isPlaying) {
+      if (tap1 === null) {
         console.log('first press')
         setTap1(Date.now());
-        setTap2(null);        
-        play();
-        setIsChap(!isChap);
+        if (chingRef.current) {
+          chingRef.current.currentTime = 0;
+          chingRef.current.play();
+        }
+        setIsChap(true);  // Next sound will be chap
       } else {
         console.log('second press')
-        //Second press - calculate interval and start playing
         setTap2(Date.now());
+        if (chapRef.current) {
+          chapRef.current.currentTime = 0;
+          chapRef.current.play();
+        }
+        setIsChap(false);  // Next sound will be ching
       }
     }
-      
   }
 
-  const startChingChap = (interval:number)=>{
+  const startChingChap = useCallback((interval: number) => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    intervalRef.current = setInterval(() => {
-      play();
-      setIsChap(!isChap);
-    }, interval);
-  } 
+    intervalRef.current = setInterval(play, interval);
+  }, [play]);
 
   useEffect(() => {
     if (tap1 !== null && tap2 !== null) {
-      // Calculate interval when tap2 is updated
-      const newInterval = (tap2 - tap1);
-      play();
-      setIsChap(prev => !prev);
+      const newInterval = tap2 - tap1;
       console.log(newInterval);
       startChingChap(newInterval);
       setIsPlaying(true);
     }
-  }, [tap2]); // Dependency on tap2 to recalculate when it changes
+  }, [tap2, startChingChap]);
 
-
-  const handleStop = ()=>{
-
-    if (isPlaying){
-      //wait untill the next chap and then stop
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      //set isPlaying to false
-      setIsPlaying(false);
+  const handleStop = () => {
+    if (isPlaying) {
+      setStopRequested(()=>(true));
+      console.log('Stop requested, will stop after next CHAP');
     }
-    //disable it when isPlaying is false
+  }
+
+  const stop = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    setIsPlaying(false);
+    setTap1(null);
+    setTap2(null);
+    setIsChap(false);
+    setStopRequested(false);
+    console.log('Stopped after CHAP');
+    return;
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <audio ref={chingRef} src="/ching.mp3" />
-        <audio ref={chapRef} src="/met.mp3" />
-        <div className="flex flex-col items-center"></div> 
-  
-        <button className=" bg-red-500 w-20 h-20 rounded-full"
-          onClick={handleTap}>
-          TAP 
-        </button>
+      <audio ref={chapRef} src="/met.mp3" />
+      <div className="flex flex-col items-center"></div> 
 
-        <button className=" bg-red-500 w-20 h-20 rounded-full"
-          onClick={handleStop}>
-          STOP
-        </button>
+      <button className="bg-red-500 w-20 h-20 rounded-full"
+        onClick={handleTap}>
+        TAP 
+      </button>
+
+      <button className="bg-red-500 w-20 h-20 rounded-full"
+        onClick={handleStop}>
+        STOP
+      </button>
 
       {/* calculate BPM then display <p>Current Tempo: {tempo} BPM</p> */}
     </main>      
-
   );
-};
+}
