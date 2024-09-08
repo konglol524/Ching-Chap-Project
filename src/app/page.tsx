@@ -1,5 +1,6 @@
 "use client"
 import Image from "next/image";
+import { Music, Square } from 'lucide-react';
 import {
   useState,
   useRef,
@@ -17,28 +18,30 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isChap, setIsChap] = useState(false);
   const [stopRequested, setStopRequested] = useState(false);
+  const [length, setLength] = useState<number | null>(0);
 
   const play = useCallback(() => {
     if (isChap) {
-          if (chapRef.current) {
-            chingRef.current?.pause();
-            chapRef.current.currentTime = 0;
-            chapRef.current.play();
-            console.log('Playing CHAP');
-          }
-          if(stopRequested){
-            stop();
-          }
+        if(stopRequested) {
+          stop();   
+        }      
+        if (chapRef.current) {
+          chingRef.current?.pause();
+          chapRef.current.currentTime = 0;
+          chapRef.current.play();
+          console.log('Playing CHAP');
+        }
+
     } else {
-      if (stopRequested) {
-        stop();
-      }  else {
+       if (!stopRequested) {
         if (chingRef.current) {
           chapRef.current?.pause();
           chingRef.current.currentTime = 0;
           chingRef.current.play();
           console.log('Playing CHING');
-        }        
+        }          
+       }  else {
+        stop();   
       }
 
     }
@@ -58,6 +61,7 @@ export default function Home() {
       } else {
         console.log('second press')
         setTap2(Date.now());
+        chingRef.current?.pause();
         if (chapRef.current) {
           chapRef.current.currentTime = 0;
           chapRef.current.play();
@@ -77,6 +81,7 @@ export default function Home() {
   useEffect(() => {
     if (tap1 !== null && tap2 !== null) {
       const newInterval = tap2 - tap1;
+      setLength(newInterval);
       console.log(newInterval);
       startChingChap(newInterval);
       setIsPlaying(true);
@@ -91,6 +96,8 @@ export default function Home() {
   }
 
   const stop = () => {
+    chingRef.current?.pause();
+    chapRef.current?.pause();    
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -104,22 +111,36 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <audio ref={chingRef} src="/ching.mp3" />
-      <audio ref={chapRef} src="/met.mp3" />
-      <div className="flex flex-col items-center"></div> 
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600 p-5 text-white">
+      <audio ref={chingRef} src="/ChingSample.mp3" />
+      <audio ref={chapRef} src="/ChapSample.mp3" />
+      
+      <h1 className="text-4xl font-bold mb-8">Ching-Chap Metronome</h1>
+      <p className="text-2xl font-semibold mb-4">{isPlaying ? 'Press stop to end' : 'Press twice to begin'}</p>
+      
+      <div className="flex flex-col items-center space-y-8">
+        <button 
+          className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${
+            isPlaying ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'
+          }`}
+          onClick={handleTap}
+        >
+          <Music size={48} />
+        </button>
 
-      <button className="bg-red-500 w-20 h-20 rounded-full"
-        onClick={handleTap}>
-        TAP 
-      </button>
+        <button 
+          className="w-24 h-24 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"
+          onClick={handleStop}
+        >
+          <Square size={36} />
+        </button>
 
-      <button className="bg-red-500 w-20 h-20 rounded-full"
-        onClick={handleStop}>
-        STOP
-      </button>
-
-      {/* calculate BPM then display <p>Current Tempo: {tempo} BPM</p> */}
-    </main>      
+        <div className="text-center">
+          <p className="text-2xl font-semibold">Current Tempo</p>
+          <p className="text-4xl font-bold">{length ? `${length / 1000} second` : '--'}</p>
+          <p className="text-xl">{length ? `${Math.round(60000 / length)} BPM` : '--'}</p>
+        </div>
+      </div>
+    </main>    
   );
 }
