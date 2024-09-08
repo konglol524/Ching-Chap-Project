@@ -67,7 +67,7 @@ export default function Home() {
       }
     }
     setIsChap((prev) => !prev);
-  }, [isChap, stopRequested]);
+  }, [isChap]);
 
   const handleTap = () => {
     if (!isPlaying) {
@@ -120,7 +120,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600 p-5 text-white">
-      <h1 className="text-4xl font-bold mb-8">Ching-Chap Metronome</h1>
+      <h1 className="text-2xl font-bold mb-8 mx-auto sm:text-4xl">Ching-Chap Metronome</h1>
       <p className="text-2xl font-semibold mb-4">
         {isPlaying ? "Press stop to end" : "Press twice to begin"}
       </p>
@@ -129,9 +129,12 @@ export default function Home() {
         <button
           className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${
             isPlaying ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"
-          }`}
+          } `}
           onClick={handleTap}
         >
+          {
+
+          }
           <Music size={48} />
         </button>
 
