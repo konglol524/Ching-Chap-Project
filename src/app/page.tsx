@@ -1,5 +1,5 @@
 "use client";
-import { Music, Square } from "lucide-react";
+import { Link, Music, Square } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 
 export default function Home() {
@@ -8,6 +8,7 @@ export default function Home() {
   const chapBufferRef = useRef<AudioBuffer | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null); // Ref to keep track of the current playing source
+  const gainNodeRef = useRef<GainNode | null>(null);
 
   const [tap1, setTap1] = useState<number | null>(null);
   const [tap2, setTap2] = useState<number | null>(null);
@@ -15,6 +16,7 @@ export default function Home() {
   const [isChap, setIsChap] = useState(false);
   const [stopRequested, setStopRequested] = useState(false);
   const [length, setLength] = useState<number | null>(0);
+  const [volume, setVolume] = useState(0.7);
 
   // Load audio files into AudioBuffer
   const loadSound = async (url: string): Promise<AudioBuffer | null> => {
@@ -38,21 +40,36 @@ export default function Home() {
     loadSound("/ChapSample.mp3").then((buffer) => {
       chapBufferRef.current = buffer;
     });
+    gainNodeRef.current = audioContextRef.current.createGain();
+    gainNodeRef.current.gain.value = volume; // Set initial volume
   }, []);
+
+  useEffect(()=>{
+    if (gainNodeRef.current && audioContextRef.current) {
+      gainNodeRef.current.gain.value = volume; // Update GainNode's gain value
+    }
+  }, [volume])
 
   // Play sound using Web Audio API
   const playSound = (buffer: AudioBuffer | null) => {
     if (currentSourceRef.current) {
       currentSourceRef.current.stop(); // Stop the current playing sound
     }    
-    if (!audioContextRef.current || !buffer) return;
+    if (!audioContextRef.current || !buffer || !gainNodeRef.current) return;
     const source = audioContextRef.current.createBufferSource();
     source.buffer = buffer;
-    source.connect(audioContextRef.current.destination);
+    source.connect(gainNodeRef.current);
+    gainNodeRef.current.connect(audioContextRef.current.destination);
+    // connection: Source -> GainNode -> Destination
     source.start(0);
     currentSourceRef.current = source;
   };
 
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume); // Update volume state
+  };
+  
   const play = useCallback(() => {
     if (isChap) {
         playSound(chapBufferRef.current); // Play Chap sound
@@ -153,6 +170,28 @@ export default function Home() {
           <p className="text-xl">{length ? `${Math.round(60000 / length)} BPM` : "--"}</p>
         </div>
       </div>
+      <label htmlFor="volume" className="block text-xl mb-2 ">Volume</label>
+          <input
+            id="volume"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={handleVolumeChange}
+            className=" w-20rem"
+          />
+
+      <footer className="mt-8">
+    <a
+      href="https://github.com/konglol524"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-bold text-white underline hover:text-gray-300"
+    >
+      Made by Kong
+    </a>
+  </footer>
     </main>
   );
 }
