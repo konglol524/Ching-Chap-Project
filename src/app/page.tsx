@@ -1,6 +1,7 @@
 "use client";
 import { Link, Music, Square } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 export default function Home() {
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -9,6 +10,7 @@ export default function Home() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null); // Ref to keep track of the current playing source
   const gainNodeRef = useRef<GainNode | null>(null);
+  const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null); // State to manage wake lock
 
   const [tap1, setTap1] = useState<number | null>(null);
   const [tap2, setTap2] = useState<number | null>(null);
@@ -42,6 +44,12 @@ export default function Home() {
     });
     gainNodeRef.current = audioContextRef.current.createGain();
     gainNodeRef.current.gain.value = volume; // Set initial volume
+    // Clean up wake lock on component unmount
+    return () => {
+      if (wakeLock) {
+        wakeLock.release();
+      }
+    };
   }, []);
 
   useEffect(()=>{
@@ -63,6 +71,8 @@ export default function Home() {
     // connection: Source -> GainNode -> Destination
     source.start(0);
     currentSourceRef.current = source;
+    // Request wake lock when audio starts playing
+    requestWakeLock();
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +143,40 @@ export default function Home() {
     setTap2(null);
     setIsChap(false);
     setStopRequested(false);
+    if (wakeLock) {
+      wakeLock.release();
+    }
   };
+
+    // Request wake lock
+    const requestWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          const wakeLockSentinel = await navigator.wakeLock.request('screen');
+          setWakeLock(wakeLockSentinel);
+  
+          // Listen for when the wake lock is released
+          wakeLockSentinel.addEventListener('release', () => {
+            console.log('Wake lock released');
+          });
+  
+          console.log('Wake lock active');
+        } else {
+          console.warn('Wake Lock API not supported on this browser.');
+        }
+      } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    };
+  
+    // Release wake lock when metronome stops
+    const releaseWakeLock = () => {
+      if (wakeLock) {
+        wakeLock.release();
+        setWakeLock(null);
+      }
+    };
+  
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600 p-5 text-white">
@@ -191,6 +234,7 @@ export default function Home() {
     >
       Made by Kong
     </a>
+                 
   </footer>
     </main>
   );
