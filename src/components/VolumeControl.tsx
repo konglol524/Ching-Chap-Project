@@ -1,7 +1,7 @@
 "use client";
 import { useContext } from "react";
 import { AudioContext } from "./AudioContextProvider";
-import { Volume2 } from "lucide-react";
+import { Volume2, VolumeOff } from "lucide-react";
 
 export const VolumeControl = () => {
   const audioCtx = useContext(AudioContext);
@@ -10,7 +10,9 @@ export const VolumeControl = () => {
 
   return (
     <div className="flex">
-      <label htmlFor="volume"><Volume2 size={30}/></label>
+    <label htmlFor="volume" className="mr-2">
+        {audioCtx.volume > 0 ? <Volume2 size={30} /> : <VolumeOff size={30} />}
+      </label>
       <input
         id="volume"
         type="range"
