@@ -165,9 +165,14 @@ export default function Home() {
           console.warn('Wake Lock API not supported on this browser.');
         }
       } catch (err) {
-        console.error(`${err.name}, ${err.message}`);
+        reportError({ message: getErrorMessage(err) })
       }
     };
+
+    function getErrorMessage(error: unknown) {
+      if (error instanceof Error) return error.message
+      return String(error)
+    }
   
     // Release wake lock when metronome stops
     const releaseWakeLock = () => {
