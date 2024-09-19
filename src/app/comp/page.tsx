@@ -1,6 +1,7 @@
 import { AudioContextProvider } from "@/components/AudioContextProvider"
 import { Metronome } from "@/components/Metronome";
 import { VolumeControl } from "@/components/VolumeControl";
+import { ChangeSound } from "@/components/ChangeSound";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
             Made by Kong
           </a>
         </footer>
+        <ChangeSound/>
       </main>
     </AudioContextProvider>
   );

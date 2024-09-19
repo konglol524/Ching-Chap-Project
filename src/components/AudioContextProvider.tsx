@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useRef, useEffect, useState, ReactNode } from "react";
+import { loadSound } from "@/utils/loadsound";
 
 type AudioContextType = {
   chingBuffer: AudioBuffer | null;
@@ -8,7 +9,9 @@ type AudioContextType = {
   gainNode: GainNode | null;
   volume: number;
   setVolume: (volume: number) => void;
-};
+  setChingBuffer: (value: AudioBuffer | null) => void;
+  setChapBuffer: (value: AudioBuffer | null) => void;
+}; 
 
 export const AudioContext = createContext<AudioContextType | null>(null);
 
@@ -24,20 +27,20 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
     gainNodeRef.current = audioContextRef.current.createGain();
     gainNodeRef.current.gain.value = volume;
 
-    const loadSound = async (url: string): Promise<AudioBuffer | null> => {
-      try {
-        const response = await fetch(url);
-        const arrayBuffer = await response.arrayBuffer();
-        return await audioContextRef.current?.decodeAudioData(arrayBuffer) ?? null;
-      } catch (error) {
-        console.error("Error loading sound:", error);
-        return null;
-      }
-    };
+    // const loadSound = async (url: string): Promise<AudioBuffer | null> => {
+    //   try {
+    //     const response = await fetch(url);
+    //     const arrayBuffer = await response.arrayBuffer();
+    //     return await audioContextRef.current?.decodeAudioData(arrayBuffer) ?? null;
+    //   } catch (error) {
+    //     console.error("Error loading sound:", error);
+    //     return null;
+    //   }
+    // };
 
     // Load ching and chap sounds
-    loadSound("/ChingSample.mp3").then(setChingBuffer);
-    loadSound("/ChapSample.mp3").then(setChapBuffer);
+    loadSound("/ChingSample.mp3", audioContextRef.current).then(setChingBuffer);
+    loadSound("/ChapSample.mp3", audioContextRef.current).then(setChapBuffer);
   }, []);
 
   useEffect(() => {
@@ -55,6 +58,8 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
         gainNode: gainNodeRef.current,
         volume,
         setVolume,
+        setChingBuffer,
+        setChapBuffer
       }}
     >
       {children}
