@@ -10,6 +10,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold mb-8 sm:text-4xl">Ching-Chap Metronome</h1>
         <Metronome />
         <VolumeControl />
+        <ChangeSound/>
         <footer className="mt-8">
           <a
             href="https://github.com/konglol524"
@@ -20,7 +21,7 @@ export default function Home() {
             Made by Kong
           </a>
         </footer>
-        <ChangeSound/>
+        
       </main>
     </AudioContextProvider>
   );

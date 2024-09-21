@@ -9,22 +9,36 @@ export const ChangeSound = () => {
 
   if (!audioCtx ||!audioCtx?.audioContext) return null;
 
-  const changeSound = (i:number)=>{
-    if(i === 1){
-        loadSound("/met.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
-        loadSound("/met.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
-    } else if (i === 2){
-        loadSound("/ChingSample.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
-        loadSound("/ChapSample.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
-    }
-  }
 
+  const changeSound = (selectedOption: string) => {
+    if (selectedOption === "duriyaban") {
+      loadSound("/Chingduriya.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
+      loadSound("/Chapduriya.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
+    } else if (selectedOption === "alternative") {
+      loadSound("/ChingSample.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
+      loadSound("/ChapSample.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
+    }
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    changeSound(event.target.value);
+  };
 
 
   return (
-    <div>
-        <button className="block border-4 border-black p-5 rounded-md my-1" onClick={()=>{changeSound(1)}}> CHANGE SOUND 1 </button>
-        <button className="block border-4 border-black p-5 rounded-md my-1" onClick={()=>{changeSound(2)}}> CHANGE SOUND 2 </button>
+    <div className="flex items-center space-x-1">
+      <label htmlFor="sound-selector" className="text-lg font-bold">
+        Select Sound:
+      </label>
+      <select
+        id="sound-selector"
+        onChange={handleChange}
+        defaultValue="duriyaban"
+        className="p-2 rounded border-2 border-gray-600 bg-white text-black"
+      >
+        <option value="duriyaban">Duriyaban</option>
+        <option value="alternative">Alternative</option>
+      </select>
     </div>
   );
 };

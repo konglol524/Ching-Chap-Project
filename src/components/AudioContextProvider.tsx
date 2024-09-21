@@ -26,21 +26,8 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     gainNodeRef.current = audioContextRef.current.createGain();
     gainNodeRef.current.gain.value = volume;
-
-    // const loadSound = async (url: string): Promise<AudioBuffer | null> => {
-    //   try {
-    //     const response = await fetch(url);
-    //     const arrayBuffer = await response.arrayBuffer();
-    //     return await audioContextRef.current?.decodeAudioData(arrayBuffer) ?? null;
-    //   } catch (error) {
-    //     console.error("Error loading sound:", error);
-    //     return null;
-    //   }
-    // };
-
-    // Load ching and chap sounds
-    loadSound("/ChingSample.mp3", audioContextRef.current).then(setChingBuffer);
-    loadSound("/ChapSample.mp3", audioContextRef.current).then(setChapBuffer);
+    loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
+    loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
   }, []);
 
   useEffect(() => {

@@ -9,8 +9,8 @@ export const VolumeControl = () => {
   if (!audioCtx) return null;
 
   return (
-    <div className="flex">
-    <label htmlFor="volume" className="mr-2">
+    <div className="flex items-center space-x-1">
+    <label htmlFor="volume">
         {audioCtx.volume > 0 ? <Volume2 size={30} /> : <VolumeOff size={30} />}
       </label>
       <input
