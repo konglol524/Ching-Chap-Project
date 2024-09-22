@@ -64,7 +64,6 @@ export const Metronome = () => {
         setTap2(Date.now());
         playSound(audioCtx.chapBuffer); // Second tap plays chap
         setIsChap(false); // Next sound will be ching
-        startChingChap();
       }
     } else {
       if (tap1 && tap2){
@@ -124,18 +123,21 @@ export const Metronome = () => {
   };
 
   const handleManual = useCallback(()=> {
+    if(isManual){
+      setIsPlaying((prev)=> false);
+    }
     setIsManual((prevManual) => !prevManual)
   }, []);
 
   return (
     <div>
       <p className="text-2xl font-semibold mb-4 sm:text-4xl">
-        {isPlaying ? "Press stop to end" : "Press twice to begin"}
+        {isManual ? "Manual mode": isPlaying ?"Press stop to end" : "Press twice to begin"}
       </p>
       <div className="flex flex-col items-center space-y-8">
         <button
           className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${
-            isPlaying ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"
+            isManual ? "bg-yellow-500 hover:bg-yellow-600": isPlaying? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"
           } `}
           onClick={handleTap}
         >
