@@ -1,7 +1,7 @@
 "use client";
 import { useContext, useState, useRef, useCallback, useEffect } from "react";
 import { AudioContext } from "./AudioContextProvider";
-import { Music, Square } from "lucide-react";
+import { Music, Square, Lock, Unlock } from "lucide-react";
 import { requestWakeLock } from "@/utils/wakelock";
 
 export const Metronome = () => {
@@ -12,6 +12,7 @@ export const Metronome = () => {
   const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);  
   const [isPlaying, setIsPlaying] = useState(false);
   const [isChap, setIsChap] = useState(false);
+  const [isManual, setIsManual] = useState(false);
   const [tap1, setTap1] = useState<number | null>(null);
   const [tap2, setTap2] = useState<number | null>(null);
   const [length, setLength] = useState<number | null>(0);
@@ -26,11 +27,8 @@ export const Metronome = () => {
     source.buffer = buffer;
     source.connect(audioCtx.gainNode);
     audioCtx.gainNode.connect(audioCtx.audioContext.destination);
-    // connection: Source -> GainNode -> Destination
     source.start(0);
     currentSourceRef.current = source;
-    // Request wake lock when audio starts playing
-    requestWakeLock(setWakeLock);
   }, [audioCtx]);
 
   const play = useCallback(() => {
@@ -55,29 +53,47 @@ export const Metronome = () => {
     if (!isPlaying) {
       if (tap1 === null) {
         setTap1(Date.now());
-        playSound(audioCtx.chingBuffer); // First tap plays ching
-        setIsChap(true); // Next sound will be chap
+        playSound(audioCtx.chingBuffer);
+        setIsChap(true);
       } else {
+        setTap2(Date.now());
+        playSound(audioCtx.chapBuffer); // Second tap plays chap
+        setIsChap(false); // Next sound will be ching
+        startChingChap();
+      }
+    } else {
+      if (tap1 && tap2){
+        if(currentSourceRef.current){
+          currentSourceRef.current.stop(); //stop sound before playing new sound
+        }
+        stop(); //stop beat
+        setTap1(Date.now());
+        playSound(audioCtx.chingBuffer);
+        setIsChap(true);
+      } else if (tap1 && !tap2){
         setTap2(Date.now());
         playSound(audioCtx.chapBuffer); // Second tap plays chap
         setIsChap(false); // Next sound will be ching
       }
     }
+
   };
 
-  const startChingChap = useCallback((interval: number) => {
+  const startChingChap = useCallback(() => {
+    if(!tap1 || !tap2) return;
+    const newInterval = tap2 - tap1;
+    setLength(newInterval);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    intervalRef.current = setInterval(play, interval);
-  }, [play]);
+    intervalRef.current = setInterval(play, newInterval);
+    setIsPlaying(true);
+    requestWakeLock(setWakeLock);
+  }, [play, tap1, tap2]);
 
   useEffect(() => {
-    if (tap1 !== null && tap2 !== null) {
-      const newInterval = tap2 - tap1;
-      setLength(newInterval);
-      startChingChap(newInterval);
-      setIsPlaying(true);
+    if ( tap1 !== null && tap2 !== null) {
+      startChingChap();
     }
   }, [tap2, startChingChap]);
 
@@ -102,6 +118,10 @@ export const Metronome = () => {
     }
   };
 
+  const handleManual = useCallback(()=> {
+    setIsManual((prevManual) => !prevManual)
+  }, []);
+
   return (
     <div>
       <p className="text-2xl font-semibold mb-4">
@@ -116,9 +136,23 @@ export const Metronome = () => {
         >
             <Music size={48} />
         </button>
-        <button className="w-24 h-24 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95" onClick={handleStop}>
-            <Square size={36} />
+        <div className="flex items-center justify-center"> 
+        <button
+          className="w-24 h-24 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"
+          onClick={handleStop}
+        >
+          <Square size={36} />
         </button>
+        <div className="absolute right-1/2 transform translate-x-20"> 
+          <button
+            className={` w-8 h-8 rounded-full flex items-center justify-center text-xl 
+            font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95
+            ${isManual ? "bg-green-500 hover:bg-green-600" : "bg-yellow-500 hover:bg-yellow-600"}`}
+            onClick={handleManual}>
+            {isManual ? <Lock size={20} /> : <Unlock size={20} />}
+          </button>
+         </div>
+</div>
         <div className="text-center">
           <p className="text-2xl font-semibold">Current Tempo</p>
           <p className="text-4xl font-bold">
