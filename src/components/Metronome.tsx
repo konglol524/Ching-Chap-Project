@@ -50,6 +50,11 @@ export const Metronome = () => {
 
   const handleTap = () => {
     if(!audioCtx) return;
+
+    if(isManual){
+      stop();
+    }
+
     if (!isPlaying) {
       if (tap1 === null) {
         setTap1(Date.now());
@@ -81,7 +86,7 @@ export const Metronome = () => {
 
   const startChingChap = useCallback(() => {
     if(!tap1 || !tap2) return;
-    const newInterval = tap2 - tap1;
+    const newInterval = Math.max(tap2 - tap1, 0);
     setLength(newInterval);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -93,7 +98,7 @@ export const Metronome = () => {
 
   useEffect(() => {
     if ( tap1 !== null && tap2 !== null) {
-      startChingChap();
+        startChingChap();  
     }
   }, [tap2, startChingChap]);
 
