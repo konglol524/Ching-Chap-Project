@@ -129,7 +129,7 @@ export const Metronome = () => {
 
   return (
     <div>
-      <p className="text-2xl font-semibold mb-4">
+      <p className="text-2xl font-semibold mb-4 sm:text-4xl">
         {isPlaying ? "Press stop to end" : "Press twice to begin"}
       </p>
       <div className="flex flex-col items-center space-y-8">
