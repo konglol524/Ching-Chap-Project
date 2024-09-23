@@ -131,7 +131,7 @@ export const Metronome = () => {
 
   return (
     <div>
-      <p className="text-2xl font-semibold mb-4 sm:text-4xl">
+      <p className="text-3xl font-semibold mb-4 sm:text-4xl">
         {isManual ? "Manual mode": isPlaying ?"Press stop to end" : "Press twice to begin"}
       </p>
       <div className="flex flex-col items-center space-y-8">
@@ -143,23 +143,19 @@ export const Metronome = () => {
         >
             <Music size={48} />
         </button>
-        <div className="flex items-center justify-center"> 
         <button
           className="w-24 h-24 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"
           onClick={handleStop}
         >
           <Square size={36} />
         </button>
-        <div className="absolute right-1/2 transform translate-x-20"> 
           <button
             className={` w-8 h-8 rounded-full flex items-center justify-center text-xl 
             font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95
-            ${isManual ? "bg-green-500 hover:bg-green-600" : "bg-yellow-500 hover:bg-yellow-600"}`}
+            ${isManual ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"}`}
             onClick={handleManual}>
             {isManual ? <Lock size={20} /> : <Unlock size={20} />}
           </button>
-         </div>
-</div>
         <div className="text-center">
           <p className="text-2xl font-semibold">Current Tempo</p>
           <p className="text-4xl font-bold">
