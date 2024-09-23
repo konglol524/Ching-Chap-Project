@@ -17,6 +17,12 @@ export const ChangeSound = () => {
     } else if (selectedOption === "alternative") {
       loadSound("/ChingSample.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
       loadSound("/ChapSample.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
+    } else if (selectedOption === 'duriyaban ching'){
+      loadSound("/Chingduriya.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
+      loadSound("/Chingduriya.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
+    } else if (selectedOption === 'duriyaban chap'){
+      loadSound("/Chapduriya.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
+      loadSound("/Chapduriya.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
     }
   };
 
@@ -37,7 +43,10 @@ export const ChangeSound = () => {
         className="p-2 rounded border-2 border-gray-600 bg-white text-black"
       >
         <option value="duriyaban">Duriyaban</option>
+        <option value="duriyaban ching">Duriyaban Ching</option>
+        <option value="duriyaban chap">Duriyaban Chap</option>        
         <option value="alternative">Alternative</option>
+
       </select>
     </div>
   );
