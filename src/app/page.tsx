@@ -1,4 +1,3 @@
-'use client'
 import { AudioContextProvider } from "@/components/AudioContextProvider"
 import { Metronome } from "@/components/Metronome";
 import { VolumeControl } from "@/components/VolumeControl";
@@ -6,22 +5,7 @@ import { ChangeSound } from "@/components/ChangeSound";
 import { useEffect } from "react";
 
 export default function Home() {
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        // Force reload the page when the user returns
-        window.location.reload();
-      }
-    };
 
-    // Add the visibility change event listener
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Cleanup the event listener on component unmount
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
 
   return (
     <AudioContextProvider>
