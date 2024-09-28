@@ -25,34 +25,12 @@ export const initAudioContext = (audioCtx: AudioContextType)=>{
   }
 }
 
-
-
 export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const [chingBuffer, setChingBuffer] = useState<AudioBuffer | null>(null);
   const [chapBuffer, setChapBuffer] = useState<AudioBuffer | null>(null);
   const [volume, setVolume] = useState(0.7);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        // Force reload the page when the user returns
-        if (audioContextRef.current?.state === 'suspended') {
-          audioContextRef.current.resume();
-        }
-        loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
-        loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
-      }
-    };
-    // Add the visibility change event listener
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Cleanup the event listener on component unmount
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
   
   useEffect(() => {
     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();

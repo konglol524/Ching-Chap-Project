@@ -5,7 +5,7 @@ import { Music, Square, Lock, Unlock } from "lucide-react";
 import { requestWakeLock } from "@/utils/wakelock";
 
 export const Metronome = () => {
-  let audioCtx = useContext(AudioContext);
+  const audioCtx = useContext(AudioContext);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null); 
 
@@ -18,20 +18,11 @@ export const Metronome = () => {
   const [length, setLength] = useState<number | null>(0);
   const [stopRequested, setStopRequested] = useState(false);
 
-  // useEffect(() => {
-  //   if (!audioCtx) {
-  //       audioCtx = useContext(AudioContext);
-  //       initAudioContext(audioCtx);
-  //   }
-  // }, [audioCtx]);
 
   const playSound = useCallback((buffer: AudioBuffer | null) => {
 
     if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
-    // if ( audioCtx?.audioContext.state === "suspended") {
-    //    audioCtx.audioContext.resume();
-    // }    
-    //doesn't help
+
     if(currentSourceRef.current){
         currentSourceRef.current.stop(); //stop sound before playing new sound
     }
