@@ -38,6 +38,9 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         // Force reload the page when the user returns
+        if (audioContextRef.current?.state === 'suspended') {
+          audioContextRef.current.resume();
+        }
         loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
         loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
       }
