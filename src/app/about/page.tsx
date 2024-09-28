@@ -1,6 +1,7 @@
 import { Music, Square, Lock } from "lucide-react";
 
 export default function About() {
+  
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-500 to-purple-600 p-5 text-white">
       {/* Title */}

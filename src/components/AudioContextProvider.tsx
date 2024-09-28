@@ -33,20 +33,6 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
   const [chingBuffer, setChingBuffer] = useState<AudioBuffer | null>(null);
   const [chapBuffer, setChapBuffer] = useState<AudioBuffer | null>(null);
   const [volume, setVolume] = useState(0.7);
-
-  useEffect(() => {
-    const logAudioContextState = () => {
-      if (audioContextRef.current) {
-        console.log("AudioContext state:", audioContextRef.current.state);
-      }
-    };
-  
-    document.addEventListener("visibilitychange", logAudioContextState);
-  
-    return () => {
-      document.removeEventListener("visibilitychange", logAudioContextState);
-    };
-  }, []);
   
   useEffect(() => {
     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
