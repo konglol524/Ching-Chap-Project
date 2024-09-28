@@ -1,3 +1,4 @@
+'use client'
 import { AudioContextProvider } from "@/components/AudioContextProvider"
 import { Metronome } from "@/components/Metronome";
 import { VolumeControl } from "@/components/VolumeControl";

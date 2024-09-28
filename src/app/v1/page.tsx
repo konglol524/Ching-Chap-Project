@@ -1,6 +1,3 @@
-
-
-
 "use client";
 import { Link, Music, Square } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
