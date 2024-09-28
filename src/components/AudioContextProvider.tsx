@@ -38,10 +38,10 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         // Force reload the page when the user returns
-        window.location.reload();
+        loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
+        loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
       }
     };
-
     // Add the visibility change event listener
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
