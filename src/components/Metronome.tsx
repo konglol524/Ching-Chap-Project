@@ -1,6 +1,6 @@
 "use client";
 import { useContext, useState, useRef, useCallback, useEffect } from "react";
-import { AudioContext } from "./AudioContextProvider";
+import { AudioContext, initAudioContext } from "./AudioContextProvider";
 import { Music, Square, Lock, Unlock } from "lucide-react";
 import { requestWakeLock } from "@/utils/wakelock";
 
@@ -21,9 +21,10 @@ export const Metronome = () => {
   const playSound = useCallback((buffer: AudioBuffer | null) => {
 
     if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
-    if ( audioCtx?.audioContext.state === "suspended") {
-       audioCtx.audioContext.resume();
-    }    
+    // if ( audioCtx?.audioContext.state === "suspended") {
+    //    audioCtx.audioContext.resume();
+    // }    
+    //doesn't help
     if(currentSourceRef.current){
         currentSourceRef.current.stop(); //stop sound before playing new sound
     }
@@ -54,7 +55,7 @@ export const Metronome = () => {
 
   const handleTap = () => {
     if(!audioCtx) return;
-
+    initAudioContext(audioCtx);
     if(isManual){
       stop();
     }

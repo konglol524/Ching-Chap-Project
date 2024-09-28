@@ -15,6 +15,16 @@ type AudioContextType = {
 
 export const AudioContext = createContext<AudioContextType | null>(null);
 
+export const initAudioContext = (audioCtx: AudioContextType)=>{
+  if(!audioCtx.audioContext){
+    audioCtx.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioCtx.gainNode = audioCtx.audioContext.createGain();
+    audioCtx.gainNode.gain.value = audioCtx.volume;
+    loadSound("/Chingduriya.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
+    loadSound("/Chapduriya.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
+  }
+}
+
 export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
@@ -22,6 +32,7 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
   const [chapBuffer, setChapBuffer] = useState<AudioBuffer | null>(null);
   const [volume, setVolume] = useState(0.7);
 
+  
   useEffect(() => {
     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     gainNodeRef.current = audioContextRef.current.createGain();
