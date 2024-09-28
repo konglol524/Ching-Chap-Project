@@ -5,7 +5,7 @@ import { Music, Square, Lock, Unlock } from "lucide-react";
 import { requestWakeLock } from "@/utils/wakelock";
 
 export const Metronome = () => {
-  const audioCtx = useContext(AudioContext);
+  let audioCtx = useContext(AudioContext);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null); 
 
@@ -17,6 +17,13 @@ export const Metronome = () => {
   const [tap2, setTap2] = useState<number | null>(null);
   const [length, setLength] = useState<number | null>(0);
   const [stopRequested, setStopRequested] = useState(false);
+
+  // useEffect(() => {
+  //   if (!audioCtx) {
+  //       audioCtx = useContext(AudioContext);
+  //       initAudioContext(audioCtx);
+  //   }
+  // }, [audioCtx]);
 
   const playSound = useCallback((buffer: AudioBuffer | null) => {
 
@@ -55,7 +62,6 @@ export const Metronome = () => {
 
   const handleTap = () => {
     if(!audioCtx) return;
-    initAudioContext(audioCtx);
     if(isManual){
       stop();
     }
