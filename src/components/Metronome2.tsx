@@ -19,19 +19,15 @@ export const Metronome2 = () => {
   const [length, setLength] = useState<number | null>(0);
   const [stopRequested, setStopRequested] = useState(false);
 
-  const playSound = useCallback(
-    (buffer: AudioBuffer | null) => {
-      if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
-
+  const playSound = useCallback((buffer: AudioBuffer | null)=>{
+    if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
       currentSourceRef.current?.stop(); // Stop previous sound
       const source = audioCtx.audioContext.createBufferSource();
       source.buffer = buffer;
       source.connect(audioCtx.gainNode).connect(audioCtx.audioContext.destination);
       source.start(0);
       currentSourceRef.current = source;
-    },
-    [audioCtx]
-  );
+    }, [audioCtx]);
 
   const play = useCallback(() => {
     if (!audioCtx?.audioContext) return;
@@ -41,7 +37,7 @@ export const Metronome2 = () => {
         playSound(isChap ? audioCtx.chapBuffer : audioCtx.chingBuffer);        
     }
     setIsChap((prev) => !prev);
-  }, [audioCtx, isChap, playSound]);
+  }, [isChap, playSound]);
 
   const handleTap = () => {
     if (!audioCtx) return;
@@ -91,7 +87,6 @@ export const Metronome2 = () => {
 
   const handleManual = () => {
     setIsManual((prev) => !prev);
-    if (isManual) stop();
   };
 
   return (
@@ -102,7 +97,7 @@ export const Metronome2 = () => {
       <div className="flex flex-col items-center space-y-8">
         <button
           className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-transform transform hover:scale-105 active:scale-95 ${
-            isManual ? "bg-yellow-500" : isPlaying ? "bg-green-500" : "bg-blue-500"
+            isManual ? firstTap ? "bg-yellow-500" : "bg-black" : isPlaying ? "bg-green-500" : "bg-blue-500"
           }`}
           onClick={handleTap}
         >
@@ -116,7 +111,7 @@ export const Metronome2 = () => {
         </button>
         <button
           className={`w-8 h-8 rounded-full flex items-center justify-center text-xl transition-transform transform hover:scale-105 active:scale-95 ${
-            isManual ? "bg-green-500" : "bg-yellow-500"
+            isManual ? "bg-yellow-500" : "bg-green-500"
           }`}
           onClick={handleManual}
         >
