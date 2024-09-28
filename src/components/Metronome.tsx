@@ -19,7 +19,11 @@ export const Metronome = () => {
   const [stopRequested, setStopRequested] = useState(false);
 
   const playSound = useCallback((buffer: AudioBuffer | null) => {
+
     if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
+    if ( audioCtx?.audioContext.state === "suspended") {
+       audioCtx.audioContext.resume();
+    }    
     if(currentSourceRef.current){
         currentSourceRef.current.stop(); //stop sound before playing new sound
     }
