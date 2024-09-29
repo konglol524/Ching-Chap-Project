@@ -18,6 +18,7 @@ export const Metronome2 = () => {
   const [firstTap, setTap] = useState(true);
   const [length, setLength] = useState<number | null>(0);
   const [stopRequested, setStopRequested] = useState(false);
+  const [bpmInput, setBpmInput] = useState<number | null>(null);
 
   const playSound = useCallback((buffer: AudioBuffer | null)=>{
     if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
@@ -57,16 +58,18 @@ export const Metronome2 = () => {
   const startChingChap = useCallback(() => {
     if (!tap1 || !tap2) return;
     const newInterval = Math.max(tap2 - tap1, 0);
-    setLength(newInterval);
-
     clearInterval(intervalRef.current!);
     intervalRef.current = setInterval(play, newInterval);
-    setIsPlaying(true);
-    requestWakeLock(setWakeLock);
   }, [play, tap1, tap2]);
 
   useEffect(() => {
-    if (tap1 !== null && tap2 !== null) startChingChap();
+    if (tap1 !== null && tap2 !== null){
+      const newInterval = Math.max(tap2 - tap1, 0);
+      setLength(newInterval);
+      startChingChap();
+      setIsPlaying(true);
+      requestWakeLock(setWakeLock);
+    } 
   }, [tap2, startChingChap]);
 
   const stop = () => {
@@ -89,6 +92,29 @@ export const Metronome2 = () => {
     setIsManual((prev) => !prev);
   };
 
+  // Calculate length based on BPM input
+  useEffect(() => {
+    if (bpmInput && !isNaN(Number(bpmInput))) {
+      const bpmValue = Number(bpmInput);
+      if (bpmValue > 0) {
+        const newLength = 60000 / bpmValue; // Convert BPM to milliseconds
+        setLength(newLength); // Update length state
+      }
+    } else {
+      setLength(null); // Reset length if input is cleared
+    }
+  }, [bpmInput]);
+
+  const startFromBpm = () => {
+    if (!bpmInput || bpmInput <= 0 || !length) return;
+    //const newInterval = 60000 / bpmInput; // Convert BPM to milliseconds
+    //setLength(newInterval);
+    setIsManual(false);
+    setIsChap(false);
+    setTap1(Date.now());
+    setTap2(Date.now() + length);
+  };
+
   return (
     <div className="text-center">
       <p className="text-3xl font-semibold mb-4 sm:text-4xl">
@@ -96,7 +122,7 @@ export const Metronome2 = () => {
       </p>
       <div className="flex flex-col items-center space-y-8">
         <button
-          className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-transform transform hover:scale-105 active:scale-95 ${
+          className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-transform duration-200 ease-in-out transform hover:scale-105 active:scale-95 ${
             isManual ? firstTap ? "bg-yellow-500" : "bg-black" : isPlaying ? "bg-green-500" : "bg-blue-500"
           }`}
           onClick={handleTap}
@@ -109,20 +135,37 @@ export const Metronome2 = () => {
         >
           <Square size={36} />
         </button>
-        <button
-          className={`w-8 h-8 rounded-full flex items-center justify-center text-xl transition-transform transform hover:scale-105 active:scale-95 ${
-            isManual ? "bg-yellow-500" : "bg-green-500"
-          }`}
-          onClick={handleManual}
-        >
-          {isManual ? <Lock size={20} /> : <Unlock size={20} />}
-        </button>
+        <div className="flex items-center justify-center space-x-10">
+          <button
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-transform transform hover:scale-105 active:scale-95 ${
+              isManual ? "bg-yellow-500" : "bg-green-500"
+            }`}
+            onClick={handleManual}>
+            {isManual ? <Lock size={20} /> : <Unlock size={20} />}
+          </button>
+          <button
+            className={` text-md w-10 h-10 rounded-full flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 bg-purple-400`}
+            onClick={startFromBpm}>
+            BPM
+          </button>
+        </div>
         <div className="text-center">
           <p className="text-2xl font-semibold">Current Tempo</p>
           <p className="text-4xl font-bold">
-            {length ? `${(length / 1000).toFixed(2)} seconds` : "--"}
+            {length ? `${(length / 1000).toFixed(2)} second` : "--"}
           </p>
-          <p className="text-xl">{length ? `${Math.round(60000 / length)} BPM` : "--"}</p>
+          <div className="flex space-x-1 items-center justify-center">
+            <input
+              type="number"
+              value={length ? Math.round(60000 / length) : ""}
+              onChange={(e) => setBpmInput(Number(e.target.value))}
+              placeholder="---"
+              className=" text-xl font-bold w-16 text-center p-1 border border-gray-300 rounded-md text-black"
+            />
+            <div className="text-xl">
+              BPM
+            </div>
+          </div>
         </div>
       </div>
     </div>
