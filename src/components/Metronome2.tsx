@@ -120,7 +120,7 @@ export const Metronome2 = () => {
           className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-transform duration-200 ease-in-out transform hover:scale-105 active:scale-95 ${
             isManual ? firstTap ? 
             "bg-gradient-to-br from-blue-600 to-blue-400 shadow-lg shadow-blue-700"
-            : "bg-gradient-to-br from-gray-800 to-gray-600 shadow-lg shadow-gray-900"
+            : "bg-gradient-to-br from-purple-600 to-purple-400 shadow-lg shadow-purple-900"
             : isPlaying ? 
             "bg-gradient-to-br from-red-600 to-red-400 shadow-lg shadow-red-700"
             : "bg-gradient-to-br from-gray-700 to-gray-500 shadow-lg shadow-gray-800"
