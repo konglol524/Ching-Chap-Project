@@ -2,14 +2,12 @@
 import { useContext, useState, useRef, useCallback, useEffect } from "react";
 import { AudioContext } from "./AudioContextProvider";
 import { Music, Square, Lock, Unlock } from "lucide-react";
-import { requestWakeLock } from "@/utils/wakelock";
 
 export const Metronome2 = () => {
   const audioCtx = useContext(AudioContext);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-  const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isChap, setIsChap] = useState(false);
   const [isManual, setIsManual] = useState(false);
@@ -68,9 +66,8 @@ export const Metronome2 = () => {
       setLength(newInterval);
       startChingChap();
       setIsPlaying(true);
-      requestWakeLock(setWakeLock);
     } 
-  }, [tap2, startChingChap]);
+  }, [tap1, tap2, startChingChap]);
 
   const stop = () => {
     clearInterval(intervalRef.current!);
@@ -79,7 +76,7 @@ export const Metronome2 = () => {
     setTap2(null);
     setIsChap(false);
     setStopRequested(false);
-    wakeLock?.release();
+  
   };
 
   const handleStop = () => {
@@ -106,9 +103,7 @@ export const Metronome2 = () => {
   }, [bpmInput]);
 
   const startFromBpm = () => {
-    if (!bpmInput || bpmInput <= 0 || !length) return;
-    //const newInterval = 60000 / bpmInput; // Convert BPM to milliseconds
-    //setLength(newInterval);
+    if ( !length) return;
     setIsManual(false);
     setIsChap(false);
     setTap1(Date.now());
