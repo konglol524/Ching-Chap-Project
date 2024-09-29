@@ -118,28 +118,35 @@ export const Metronome2 = () => {
       <div className="flex flex-col items-center space-y-8">
         <button
           className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-transform duration-200 ease-in-out transform hover:scale-105 active:scale-95 ${
-            isManual ? firstTap ? "bg-yellow-500" : "bg-black" : isPlaying ? "bg-green-500" : "bg-blue-500"
+            isManual ? firstTap ? 
+            "bg-gradient-to-br from-blue-600 to-blue-400 shadow-lg shadow-blue-700"
+            : "bg-gradient-to-br from-gray-800 to-gray-600 shadow-lg shadow-gray-900"
+            : isPlaying ? 
+            "bg-gradient-to-br from-red-600 to-red-400 shadow-lg shadow-red-700"
+            : "bg-gradient-to-br from-gray-700 to-gray-500 shadow-lg shadow-gray-800"
           }`}
           onClick={handleTap}
         >
           <Music size={48} />
         </button>
         <button
-          className="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center text-xl transition-transform transform hover:scale-105 active:scale-95"
+          className="w-24 h-24 rounded-full bg-gradient-to-br from-red-600 to-red-400 flex items-center justify-center text-xl transition-transform transform hover:scale-105 active:scale-95 shadow-lg shadow-red-700"
           onClick={handleStop}
         >
           <Square size={36} />
         </button>
         <div className="flex items-center justify-center space-x-10">
           <button
-            className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-transform transform hover:scale-105 active:scale-95 ${
-              isManual ? "bg-yellow-500" : "bg-green-500"
-            }`}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-transform transform hover:scale-105 active:scale-95 ${
+                    isManual
+                      ? "bg-gradient-to-br from-blue-600 to-blue-400 shadow-lg shadow-blue-800"
+                      : "bg-gradient-to-br from-gray-700 to-gray-500 shadow-lg shadow-gray-800"
+                  }`}
             onClick={handleManual}>
             {isManual ? <Lock size={20} /> : <Unlock size={20} />}
           </button>
           <button
-            className={` text-md w-10 h-10 rounded-full flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 bg-purple-400`}
+          className="w-12 h-12 rounded-full flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 bg-gradient-to-br from-blue-600 to-red-400 shadow-lg shadow-gray-800"
             onClick={startFromBpm}>
             BPM
           </button>
