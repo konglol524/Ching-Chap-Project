@@ -1,7 +1,6 @@
 "use client";
 import { createContext, useRef, useEffect, useState, ReactNode } from "react";
 import { loadSound } from "@/utils/loadsound";
-import { requestWakeLock } from "@/utils/wakelock";
 
 type AudioContextType = {
   chingBuffer: AudioBuffer | null;
@@ -35,7 +34,6 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
   const [volume, setVolume] = useState(0.7);
   
   useEffect(() => {
-    requestWakeLock(setWakeLock);
     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     gainNodeRef.current = audioContextRef.current.createGain();
     gainNodeRef.current.gain.value = volume;
