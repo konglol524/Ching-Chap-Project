@@ -47,11 +47,15 @@ export const Metronome3 = () => {
 
   const handleTap = () => {
     if (!audioCtx) return;
-    //alert(audioCtx?.audioContext?.state)
-    if(audioCtx?.audioContext?.state == 'interrupted'){
-      alert('bro')
-      //audioCtx?.audioContext?.resume();
-    }
+    
+    // if(audioCtx?.audioContext?.state){
+    //   if(audioCtx?.audioContext?.state === "interrupted"){
+    //     alert(audioCtx?.audioContext?.state)
+    //     //audioCtx?.audioContext?.resume();        
+    //   }
+
+    // }
+    audioCtx.audioContext?.resume();
     
     const now = Date.now();
     if(isManual) stop();
