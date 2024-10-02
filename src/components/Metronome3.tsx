@@ -48,8 +48,8 @@ export const Metronome3 = () => {
   const handleTap = () => {
     if (!audioCtx) return;
     if(audioCtx?.audioContext?.state == 'suspended'){
-      //alert(audioCtx?.audioContext?.state)
-      audioCtx?.audioContext?.resume();
+      alert(audioCtx?.audioContext?.state)
+      //audioCtx?.audioContext?.resume();
     }
     
     const now = Date.now();
