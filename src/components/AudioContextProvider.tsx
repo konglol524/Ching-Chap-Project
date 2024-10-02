@@ -11,19 +11,19 @@ type AudioContextType = {
   setVolume: (volume: number) => void;
   setChingBuffer: (value: AudioBuffer | null) => void;
   setChapBuffer: (value: AudioBuffer | null) => void;
-}; 
+};
 
 export const AudioContext = createContext<AudioContextType | null>(null);
 
-export const initAudioContext = (audioCtx: AudioContextType)=>{
-  if(!audioCtx.audioContext){
+export const initAudioContext = (audioCtx: AudioContextType) => {
+  if (!audioCtx.audioContext) {
     audioCtx.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     audioCtx.gainNode = audioCtx.audioContext.createGain();
     audioCtx.gainNode.gain.value = audioCtx.volume;
     loadSound("/Chingduriya.mp3", audioCtx.audioContext).then(audioCtx.setChingBuffer);
     loadSound("/Chapduriya.mp3", audioCtx.audioContext).then(audioCtx.setChapBuffer);
   }
-}
+};
 
 export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
   const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);
@@ -32,14 +32,31 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
   const [chingBuffer, setChingBuffer] = useState<AudioBuffer | null>(null);
   const [chapBuffer, setChapBuffer] = useState<AudioBuffer | null>(null);
   const [volume, setVolume] = useState(0.7);
-  
+
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible' && audioContextRef.current?.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      wakeLock?.release();
+    };
+  }, []);
+
   useEffect(() => {
     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     gainNodeRef.current = audioContextRef.current.createGain();
     gainNodeRef.current.gain.value = volume;
     loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
     loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
-    return () => {wakeLock?.release();}
+    return () => {
+      wakeLock?.release();
+    };
   }, []);
 
   useEffect(() => {
@@ -58,7 +75,7 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
         volume,
         setVolume,
         setChingBuffer,
-        setChapBuffer
+        setChapBuffer,
       }}
     >
       {children}
