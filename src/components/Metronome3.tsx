@@ -44,7 +44,7 @@ export const Metronome3 = () => {
   }, [isPlaying, length]);
 
   useEffect(() => {
-    if (!audioCtx) {
+    if (!audioCtx?.audioContext) {
       alert('lmaoe')
     }
   }, [audioCtx]);
@@ -72,6 +72,7 @@ export const Metronome3 = () => {
   };
 
   const handleTap = () => {
+    alert('HA')
     if (!audioCtx) return;
     const now = Date.now();
     if(isManual) stop();
