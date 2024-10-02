@@ -43,6 +43,12 @@ export const Metronome3 = () => {
     };
   }, [isPlaying, length]);
 
+  useEffect(() => {
+    if (!audioCtx) {
+      alert('lmaoe')
+    }
+  }, [audioCtx]);
+
   const playSound = (buffer: AudioBuffer | null)=>{
     if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
       currentSourceRef.current?.stop(); // Stop previous sound

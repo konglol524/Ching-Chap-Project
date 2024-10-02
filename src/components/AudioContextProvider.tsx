@@ -53,6 +53,8 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
+  
+
   useEffect(() => {
     const handleFocus = () => {
       if (audioContextRef.current?.state === 'closed') {
