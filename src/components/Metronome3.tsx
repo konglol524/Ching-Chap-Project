@@ -1,6 +1,6 @@
 "use client";
 import { useContext, useState, useRef, useCallback, useEffect } from "react";
-import { AudioContext } from "./AudioContextProvider";
+import { AudioContext, initAudioContext } from "./AudioContextProvider";
 import { Music, Square, Lock, Unlock } from "lucide-react";
 import { requestWakeLock } from "@/utils/wakelock";
 
@@ -22,32 +22,6 @@ export const Metronome3 = () => {
   const [firstTap, setTap] = useState(true);
   const [length, setLength] = useState<number | null>(0);
   const [bpmInput, setBpmInput] = useState<number | null>(null);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // Pause the metronome
-        clearInterval(intervalRef.current!);
-      } else {
-        // Resume the metronome if it was playing
-        if (isPlaying && length) {
-          intervalRef.current = setInterval(play, length);
-        }
-      }
-    };
-  
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-  
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isPlaying, length]);
-
-  useEffect(() => {
-    if (!audioCtx?.audioContext) {
-      alert('lmaoe')
-    }
-  }, [audioCtx]);
 
   const playSound = (buffer: AudioBuffer | null)=>{
     if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
@@ -72,8 +46,11 @@ export const Metronome3 = () => {
   };
 
   const handleTap = () => {
-    alert('HA')
+    if (!audioCtx){
+      alert('lol')
+    }    
     if (!audioCtx) return;
+
     const now = Date.now();
     if(isManual) stop();
     if(firstTap){
