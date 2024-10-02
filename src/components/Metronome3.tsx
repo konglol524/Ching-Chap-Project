@@ -46,8 +46,11 @@ export const Metronome3 = () => {
   };
 
   const handleTap = () => {
-    if (!audioCtx){
-      alert('lol')
+    if(!audioCtx?.chingBuffer){
+      alert('Buffer Gone')
+    }    
+    if (!audioCtx?.audioContext){
+      alert('lol audiocontext')
     }    
     if (!audioCtx) return;
 
