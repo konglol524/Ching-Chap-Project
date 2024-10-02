@@ -52,6 +52,10 @@ export const Metronome3 = () => {
     if (!audioCtx?.audioContext){
       alert('lol audiocontext')
     }    
+    if(audioCtx?.audioContext?.state){
+      alert(audioCtx?.audioContext?.state)
+    }
+    
     if (!audioCtx) return;
 
     const now = Date.now();
