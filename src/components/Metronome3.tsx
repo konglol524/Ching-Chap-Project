@@ -23,6 +23,26 @@ export const Metronome3 = () => {
   const [length, setLength] = useState<number | null>(0);
   const [bpmInput, setBpmInput] = useState<number | null>(null);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Pause the metronome
+        clearInterval(intervalRef.current!);
+      } else {
+        // Resume the metronome if it was playing
+        if (isPlaying && length) {
+          intervalRef.current = setInterval(play, length);
+        }
+      }
+    };
+  
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+  
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isPlaying, length]);
+
   const playSound = (buffer: AudioBuffer | null)=>{
     if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
       currentSourceRef.current?.stop(); // Stop previous sound
