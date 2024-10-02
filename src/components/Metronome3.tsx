@@ -47,14 +47,6 @@ export const Metronome3 = () => {
 
   const handleTap = () => {
     if (!audioCtx) return;
-    
-    // if(audioCtx?.audioContext?.state){
-    //   if(audioCtx?.audioContext?.state === "interrupted"){
-    //     alert(audioCtx?.audioContext?.state)
-    //     //audioCtx?.audioContext?.resume();        
-    //   }
-
-    // }
     audioCtx.audioContext?.resume();
     
     const now = Date.now();
@@ -124,7 +116,9 @@ export const Metronome3 = () => {
   }, [bpmInput]);
 
   const startFromBpm = () => {
-    if ( !length) return;
+    if (!audioCtx) return;
+    audioCtx.audioContext?.resume();
+    if (!length) return;
     setIsManual(false);
     isChap.current = false;
     setTap1(Date.now());
