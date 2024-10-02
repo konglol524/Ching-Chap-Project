@@ -46,18 +46,12 @@ export const Metronome3 = () => {
   };
 
   const handleTap = () => {
-    if(!audioCtx?.chingBuffer){
-      alert('Buffer Gone')
-    }    
-    if (!audioCtx?.audioContext){
-      alert('lol audiocontext')
-    }    
-    if(audioCtx?.audioContext?.state){
-      alert(audioCtx?.audioContext?.state)
+    if (!audioCtx) return;
+    if(audioCtx?.audioContext?.state == 'suspended'){
+      //alert(audioCtx?.audioContext?.state)
+      audioCtx?.audioContext?.resume();
     }
     
-    if (!audioCtx) return;
-
     const now = Date.now();
     if(isManual) stop();
     if(firstTap){
