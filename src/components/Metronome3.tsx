@@ -48,7 +48,6 @@ export const Metronome3 = () => {
   const handleTap = () => {
     if (!audioCtx) return;
     audioCtx.audioContext?.resume();
-    
     const now = Date.now();
     if(isManual) stop();
     if(firstTap){
@@ -77,7 +76,7 @@ export const Metronome3 = () => {
       startChingChap();
       setIsPlaying(true);
     } 
-  }, [tap1, tap2]);
+  }, [tap2]);
 
   const stop = () => {
     clearInterval(intervalRef.current!);
