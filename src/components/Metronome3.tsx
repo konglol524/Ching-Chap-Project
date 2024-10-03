@@ -116,7 +116,7 @@ export const Metronome3 = () => {
 
   const startFromBpm = () => {
     if (!audioCtx) return;
-    clearInterval(intervalRef.current!);
+    stop();
     audioCtx.audioContext?.resume();
     if (!length) return;
     setIsManual(false);
