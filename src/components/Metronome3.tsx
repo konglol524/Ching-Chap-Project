@@ -120,7 +120,8 @@ export const Metronome3 = () => {
     audioCtx.audioContext?.resume();
     if (!length) return;
     setIsManual(false);
-    isChap.current = false;
+    playSound(audioCtx.chingBuffer);
+    isChap.current = true;
     setTap1(Date.now());
     setTap2(Date.now() + length);
   };
