@@ -3,10 +3,11 @@ import { useContext } from "react";
 import { AudioContext } from "./AudioContextProvider";
 import { Volume2, VolumeOff } from "lucide-react";
 import { loadSound } from "@/utils/loadsound";
+import { useTranslation } from "react-i18next";
 
 export const ChangeSound = () => {
   const audioCtx = useContext(AudioContext);
-
+  const { t } = useTranslation();
   if (!audioCtx ||!audioCtx?.audioContext) return null;
 
   const changeSound = (selectedOption: string) => {
@@ -33,7 +34,7 @@ export const ChangeSound = () => {
   return (
     <div className="flex items-center space-x-1 mt-4">
       <label htmlFor="sound-selector" className="text-lg font-bold">
-        Select Sound:
+        {t('Select Sound')}:
       </label>
       <select
         id="sound-selector"
@@ -41,10 +42,10 @@ export const ChangeSound = () => {
         defaultValue="duriyaban"
         className="p-2 rounded border-2 border-gray-600 bg-white text-black"
       >
-        <option value="duriyaban">Duriyaban</option>
-        <option value="duriyaban ching">Duriyaban Ching</option>
-        <option value="duriyaban chap">Duriyaban Chap</option>        
-        <option value="alternative">Alternative</option>
+        <option value="duriyaban">{t('Duriyaban')}</option>
+        <option value="duriyaban ching">{t('Duriyaban Ching')}</option>
+        <option value="duriyaban chap">{t('Duriyaban Chap')}</option>        
+        <option value="alternative">{t('Alternative')}</option>
 
       </select>
     </div>

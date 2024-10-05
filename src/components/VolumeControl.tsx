@@ -51,7 +51,10 @@ export const VolumeControl = () => {
     setIsSliderVisible((prev) => !prev);
   };
 
-
+  const getSliderBackground = (volume: number) => {
+    const percentage = volume * 100;
+    return `linear-gradient(to right, #1E90FF ${percentage}%, #444 ${percentage}%)`;
+  };
 
   return (
     <div className="relative flex items-center space-x-2 mt-4">
@@ -68,8 +71,7 @@ export const VolumeControl = () => {
         )}
       </button>
 
-      {/* Volume Slider - Now between the main volume icon and slider toggle button */}
-      {isSliderVisible && (
+    {isSliderVisible && (
         <div
           ref={sliderRef}
           className="flex items-center p-2 bg-gray-800 bg-opacity-90 rounded-md shadow-lg transition-all duration-300 z-30"
@@ -88,7 +90,8 @@ export const VolumeControl = () => {
                 setPreviousVolume(newVolume);
               }
             }}
-            className="w-48 h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer focus:outline-none"
+            style={{ background: getSliderBackground(audioCtx.volume) }} // Dynamic background color
+            className="w-48 h-3 rounded-lg appearance-none cursor-pointer focus:outline-none"
             aria-label="Volume slider"
           />
         </div>

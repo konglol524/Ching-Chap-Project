@@ -11,6 +11,7 @@ type AudioContextType = {
   setVolume: (volume: number) => void;
   setChingBuffer: (value: AudioBuffer | null) => void;
   setChapBuffer: (value: AudioBuffer | null) => void;
+  closeAudio: ()=>void;
 };
 
 export const AudioContext = createContext<AudioContextType | null>(null);
@@ -32,6 +33,13 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
   const [chingBuffer, setChingBuffer] = useState<AudioBuffer | null>(null);
   const [chapBuffer, setChapBuffer] = useState<AudioBuffer | null>(null);
   const [volume, setVolume] = useState(0.7);
+
+  const closeAudio = () => {
+    // Your logic to stop the audio playback
+    if (audioContextRef.current) {
+        audioContextRef.current.close(); // Adjust as necessary
+    }
+};
 
   useEffect(() => {
     const handleVisibilityChange = async () => {
@@ -103,6 +111,7 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
         setVolume,
         setChingBuffer,
         setChapBuffer,
+        closeAudio
       }}
     >
       {children}

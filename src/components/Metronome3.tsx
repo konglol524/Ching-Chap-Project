@@ -1,10 +1,12 @@
 "use client";
-import { useContext, useState, useRef, useCallback, useEffect } from "react";
+import { useContext, useState, useRef, useCallback, useEffect, useTransition } from "react";
 import { AudioContext, initAudioContext } from "./AudioContextProvider";
 import { Music, Square, Lock, Unlock } from "lucide-react";
 import { requestWakeLock } from "@/utils/wakelock";
+import { useTranslation } from "next-i18next";
 
 export const Metronome3 = () => {
+  const { t } = useTranslation();
   const audioCtx = useContext(AudioContext);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
@@ -127,9 +129,9 @@ export const Metronome3 = () => {
   };
 
   return (
-<div className="text-center">
+<div className="text-center mt-5">
   <p className="text-2xl font-semibold mb-5 sm:text-4xl">
-    {isManual ? "Manual mode" : isPlaying ? "Press stop to end" : "Press twice to begin"}
+    {isManual ? t("Manual mode") : isPlaying ? t("Press stop to end") : t("Press twice to begin")}
   </p>
   <div className="flex flex-col items-center space-y-7 sm:space-y-10"> {/* Increased space-y for more separation */}
     <button
@@ -147,7 +149,11 @@ export const Metronome3 = () => {
     </button>
     
     <button
-      className="w-24 h-24 rounded-full bg-gradient-to-br from-red-600 to-red-400 flex items-center justify-center text-xl transition-transform transform hover:scale-105 active:scale-95 shadow-lg shadow-red-700"
+      className={`w-24 h-24 rounded-full flex items-center justify-center text-xl transition-transform transform hover:scale-105 active:scale-95 shadow-lg 
+              ${isPlaying ? 
+        "bg-gradient-to-br from-red-600 to-red-400 shadow-lg shadow-red-700"
+        : "bg-gradient-to-br from-gray-700 to-gray-500 shadow-lg shadow-gray-800"}
+      `}
       onClick={handleStop}
     >
       <Square size={36} />
@@ -174,9 +180,9 @@ export const Metronome3 = () => {
     </div>
 
     <div className="text-center space-y-2"> {/* Added space-y for separation */}
-      <p className="text-2xl font-semibold sm:text-3xl ">Current Tempo</p>
+      <p className="text-2xl font-semibold sm:text-3xl ">{t("Current Tempo")}</p>
       <p className="text-2xl font-bold sm:text-3xl ">
-        {length ? `${(length / 1000).toFixed(2)} second` : "--"}
+      {length ? `${(length / 1000).toFixed(2)} ${t('second')}` : "--"}
       </p>
       <div className="flex space-x-1 items-center justify-center">
         <input
