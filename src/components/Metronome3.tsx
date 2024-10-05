@@ -11,7 +11,6 @@ export const Metronome3 = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-  const testNum = useRef<number>(0);
   const isChap = useRef<boolean>(false);
   const stopRequested = useRef<boolean>(false);
 
@@ -41,10 +40,9 @@ export const Metronome3 = () => {
         stop();
     } else {
         playSound(isChap.current ? audioCtx.chapBuffer : audioCtx.chingBuffer);  
-        console.log(testNum)
     }
-    testNum.current += 1;
     isChap.current = !isChap.current;
+
   };
 
   const handleTap = () => {
@@ -93,7 +91,6 @@ export const Metronome3 = () => {
   };
 
   const handleStop = () => {
-    console.log(testNum);
     if (isPlaying) {
       stopRequested.current = true;
     }
