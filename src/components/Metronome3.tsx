@@ -193,7 +193,7 @@ className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font
           placeholder="---"
           className="text-xl font-bold w-16 text-center p-1 border border-gray-300 rounded-md text-black"
         />
-        <div className="text-xl">
+        <div className="text-xl unselectable">
           BPM
         </div>
       </div>
