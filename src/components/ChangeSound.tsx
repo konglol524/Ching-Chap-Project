@@ -33,7 +33,7 @@ export const ChangeSound = () => {
 
   return (
     <div className="flex items-center space-x-1 mt-4">
-      <label htmlFor="sound-selector" className="text-lg font-bold">
+      <label htmlFor="sound-selector" className="text-select-none text-lg font-bold">
         {t('Select Sound')}:
       </label>
       <select

@@ -1,6 +1,7 @@
 import { Metronome3 } from "@/components/Metronome3";
 import { VolumeControl } from "@/components/VolumeControl";
 import { ChangeSound } from "@/components/ChangeSound";
+import '../../styles/globals.css'
 
 export default function Home() {
 
