@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react"; 
 import { LanguageToggle } from "./LanguageToggle";
+import Link from "next/link";
 
 export const DropdownNavigator = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -14,13 +15,11 @@ export const DropdownNavigator = () => {
       <header className="w-full bg-gradient-to-r from-gray-900 via-gray-800 to-red-900 bg-opacity-90 fixed top-0 left-0 right-0 z-10 shadow-lg">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           {/* Logo or Title */}
-          <a href="/">
-            <div className="text-white text-md sm:text-2xl font-bold tracking-wide hover:text-red-600 transition-colors duration-300">
+            <div className="text-select-none text-white text-md sm:text-2xl font-bold tracking-wide hover:text-red-600 transition-colors duration-300">
               {t("Nav:logo")}
             </div>
-          </a>
       
-          <div className="flex items-center">
+          <div className="text-select-none flex items-center">
             {/* Dropdown Button */}
             <div className="relative inline-block text-left">
               <button
