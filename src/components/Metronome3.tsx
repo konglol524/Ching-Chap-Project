@@ -127,7 +127,7 @@ export const Metronome3 = () => {
 
   return (
 <div className="text-center mt-5">
-  <p className="text-xl font-semibold mb-5 sm:text-4xl">
+  <p className="select-none text-xl font-semibold mb-5 sm:text-4xl">
     {isManual ? t("Manual mode") : isPlaying ? t("Press stop to end") : t("Press twice to begin")}
   </p>
   <div className="flex flex-col items-center space-y-7 sm:space-y-10"> {/* Increased space-y for more separation */}
@@ -173,7 +173,7 @@ className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font
       </button>
       
       <button
-        className="w-12 h-12 rounded-full flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 bg-gradient-to-br from-blue-600 to-red-400 shadow-lg shadow-gray-800"
+        className="select-none w-12 h-12 rounded-full flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 bg-gradient-to-br from-blue-600 to-red-400 shadow-lg shadow-gray-800"
         onClick={startFromBpm}
       >
         BPM
@@ -181,8 +181,8 @@ className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font
     </div>
 
     <div className="text-center space-y-2"> {/* Added space-y for separation */}
-      <p className="text-2xl font-semibold sm:text-3xl ">{t("Current Tempo")}</p>
-      <p className="text-2xl font-bold sm:text-3xl ">
+      <p className="select-none text-2xl font-semibold sm:text-3xl ">{t("Current Tempo")}</p>
+      <p className="select-none text-2xl font-bold sm:text-3xl ">
       {length ? `${(length / 1000).toFixed(2)} ${t('second')}` : "--"}
       </p>
       <div className="flex space-x-1 items-center justify-center">
@@ -193,7 +193,7 @@ className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font
           placeholder="---"
           className="text-xl font-bold w-16 text-center p-1 border border-gray-300 rounded-md text-black"
         />
-        <div className="text-xl unselectable">
+        <div className="select-none text-xl">
           BPM
         </div>
       </div>
