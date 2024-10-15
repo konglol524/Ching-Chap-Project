@@ -41,47 +41,47 @@ export const AudioContextProvider = ({ children }: { children: ReactNode }) => {
     }
 };
 
-  useEffect(() => {
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible' && audioContextRef.current?.state === 'suspended') {
-        //await audioContextRef.current.resume();
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-        gainNodeRef.current = audioContextRef.current.createGain();
-        gainNodeRef.current.gain.value = volume;
-        loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
-        loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
-      }
-    };
+  // useEffect(() => {
+  //   const handleVisibilityChange = async () => {
+  //     if (document.visibilityState === 'visible' && audioContextRef.current?.state === 'suspended') {
+  //       //await audioContextRef.current.resume();
+  //       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+  //       gainNodeRef.current = audioContextRef.current.createGain();
+  //       gainNodeRef.current.gain.value = volume;
+  //       loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
+  //       loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
+  //     }
+  //   };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+  //   document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      wakeLock?.release();
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener('visibilitychange', handleVisibilityChange);
+  //     wakeLock?.release();
+  //   };
+  // }, []);
 
   
 
-  useEffect(() => {
-    const handleFocus = () => {
-      if (audioContextRef.current?.state === 'closed') {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-        // Reinitialize other audio-related setup...
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-        gainNodeRef.current = audioContextRef.current.createGain();
-        gainNodeRef.current.gain.value = volume;
-        loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
-        loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
-      }
-    };
+  // useEffect(() => {
+  //   const handleFocus = () => {
+  //     if (audioContextRef.current?.state === 'closed') {
+  //       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+  //       // Reinitialize other audio-related setup...
+  //       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+  //       gainNodeRef.current = audioContextRef.current.createGain();
+  //       gainNodeRef.current.gain.value = volume;
+  //       loadSound("/Chingduriya.mp3", audioContextRef.current).then(setChingBuffer);
+  //       loadSound("/Chapduriya.mp3", audioContextRef.current).then(setChapBuffer);
+  //     }
+  //   };
   
-    window.addEventListener('focus', handleFocus);
+  //   window.addEventListener('focus', handleFocus);
   
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener('focus', handleFocus);
+  //   };
+  // }, []);
 
   useEffect(() => {
     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();

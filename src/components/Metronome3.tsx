@@ -127,7 +127,7 @@ export const Metronome3 = () => {
 
   return (
 <div className="text-center mt-5">
-  <p className="text-2xl font-semibold mb-5 sm:text-4xl">
+  <p className="text-xl font-semibold mb-5 sm:text-4xl">
     {isManual ? t("Manual mode") : isPlaying ? t("Press stop to end") : t("Press twice to begin")}
   </p>
   <div className="flex flex-col items-center space-y-7 sm:space-y-10"> {/* Increased space-y for more separation */}
