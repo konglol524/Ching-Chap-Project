@@ -1,10 +1,8 @@
 "use client";
 import { useContext, useState, useRef, useEffect } from "react";
-import { AudioContext } from "./AudioContextProvider";
-import { Music, Square, Lock, Unlock } from "lucide-react";
+import { AudioContext, AudioContextType } from "./AudioContextProvider";
 import { requestWakeLock } from "@/utils/wakelock";
 import { useTranslation } from "next-i18next";
-import { CircularKnob } from "./CircularKnob";
 import {TapButton} from "./TapButton";
 import { StopButton } from "./StopButton";
 import { ManualButton } from "./ManualButton";
@@ -13,12 +11,19 @@ import { BPMKnob } from "./BPMKnob";
 
 export const Metronome = () => {
   const { t } = useTranslation();
-  const audioCtx = useContext(AudioContext);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioCtxConfig = useContext(AudioContext);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
-
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isChap = useRef<boolean>(false);
   const stopRequested = useRef<boolean>(false);
+
+  const audioCtx = useRef<AudioContextType | null>(null);
+//   if (audioCtxRef.current === null && audioCtx) {
+//     audioCtxRef.current = audioCtx;
+//   }
+  useEffect(()=>{
+    audioCtx.current = audioCtxConfig
+  }, [audioCtxConfig])
 
   const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);  
   const [isPlaying, setIsPlaying] = useState(false);
@@ -29,39 +34,55 @@ export const Metronome = () => {
   const [length, setLength] = useState<number | null>(0);
   const [bpmInput, setBpmInput] = useState<number | null>(null);
   const [bpmKnobValue, setBpmKnobValue] = useState<number>(120); // State for BPM knob
+  const isPlayingRef = useRef(isPlaying);
+  const lengthRef = useRef(length);
+
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  useEffect(()=>{
+    lengthRef.current = length;
+  }, [length])
 
   const playSound = (buffer: AudioBuffer | null) => {
-    if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
+    if (!audioCtx.current?.audioContext || !buffer || !audioCtx.current.gainNode) return;
     currentSourceRef.current?.stop(); // Stop previous sound
-    const source = audioCtx.audioContext.createBufferSource();
+    const source = audioCtx.current.audioContext.createBufferSource();
     source.buffer = buffer;
-    source.connect(audioCtx.gainNode).connect(audioCtx.audioContext.destination);
+    source.connect(audioCtx.current.gainNode).connect(audioCtx.current.audioContext.destination);
     source.start(0);
     currentSourceRef.current = source;
   };
 
   const play = () => {
-    if (!audioCtx?.audioContext) return;
+    if (!audioCtx.current?.audioContext || !lengthRef.current) return;
     if (!isChap.current && stopRequested.current) {
       stop();
     } else {
-      playSound(isChap.current ? audioCtx.chapBuffer : audioCtx.chingBuffer);  
+        playSound(isChap.current ? audioCtx.current.chapBuffer : audioCtx.current.chingBuffer);  
+        if(isPlayingRef.current){
+            timeoutRef.current = setTimeout(() => {
+                play();
+            }, lengthRef.current);        
+        }      
     }
     isChap.current = !isChap.current;
+
   };
 
   const handleTap = () => {
-    if (!audioCtx) return;
-    audioCtx.audioContext?.resume();
+    if (!audioCtx.current) return;
+    audioCtx.current.audioContext?.resume();
     const now = Date.now();
     if (isManual) stop();
     if (firstTap) {
       stop();
       setTap1(now);
-      playSound(audioCtx.chingBuffer);
+      playSound(audioCtx.current.chingBuffer);
     } else {
       setTap2(now);
-      playSound(audioCtx.chapBuffer);
+      playSound(audioCtx.current.chapBuffer);
     }
     setTap((prev) => !prev);
   };
@@ -69,22 +90,28 @@ export const Metronome = () => {
   const startChingChap = () => {
     if (!tap1 || !tap2) return;
     const newInterval = Math.max(tap2 - tap1, 0);
-    clearInterval(intervalRef.current!);
-    intervalRef.current = setInterval(play, newInterval);
     requestWakeLock(setWakeLock);
+        //change to set timeout
+    setIsPlaying(true);     
+    setLength(newInterval);
+    if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(play, newInterval);
+    
   };
 
   useEffect(() => {
+    //change to set timeout
     if (tap1 !== null && tap2 !== null) {
-      const newInterval = Math.max(tap2 - tap1, 0);
-      setLength(newInterval);
-      startChingChap();
-      setIsPlaying(true);
-    } 
+        startChingChap();
+      } 
   }, [tap2]);
 
   const stop = () => {
-    clearInterval(intervalRef.current!);
+    if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+    }
     setIsPlaying(false);
     setTap1(null);
     setTap2(null);
@@ -103,7 +130,14 @@ export const Metronome = () => {
 
   const handleManual = () => {
     if (isPlaying) {
+        if(isChap.current){
+            setTap(false)
+        } else {
+            setTap(true)
+        }
+      //const lastSound = isChap.current
       stop();
+      //isChap.current = lastSound
     }
     setIsManual((prev) => !prev);
   };
@@ -114,10 +148,12 @@ export const Metronome = () => {
       if (bpmValue > 0) {
         const newLength = 60000 / bpmValue; // Convert BPM to milliseconds
         setLength(newLength); // Update length state
-        if (isPlaying) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = setInterval(play, newLength);
-        }
+        // if (isPlaying ) {
+        //     if (timeoutRef.current) {
+        //         clearTimeout(timeoutRef.current);
+        //     }
+        //     timeoutRef.current = setTimeout(play, newLength);
+        // }
       }
     } else {
       setLength(null); // Reset length if input is cleared
@@ -125,12 +161,12 @@ export const Metronome = () => {
   }, [bpmInput, bpmKnobValue]);
 
   const startFromBpm = () => {
-    if (!audioCtx) return;
+    if (!audioCtx.current) return;
     stop();
-    audioCtx.audioContext?.resume();
+    audioCtx.current.audioContext?.resume();
     if (!length) return;
     setIsManual(false);
-    playSound(audioCtx.chingBuffer);
+    playSound(audioCtx.current.chingBuffer);
     isChap.current = true;
     setTap1(Date.now());
     setTap2(Date.now() + length);

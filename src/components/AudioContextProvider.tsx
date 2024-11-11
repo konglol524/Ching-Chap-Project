@@ -2,7 +2,7 @@
 import { createContext, useRef, useEffect, useState, ReactNode } from "react";
 import { loadSound } from "@/utils/loadsound";
 
-type AudioContextType = {
+export type AudioContextType = {
   chingBuffer: AudioBuffer | null;
   chapBuffer: AudioBuffer | null;
   audioContext: AudioContext | null;
