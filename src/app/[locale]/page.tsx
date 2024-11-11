@@ -1,5 +1,4 @@
-
-import { Metronome } from "@/components/Metronome4";
+import {Metronome} from "@/components/Metronome2"
 import { VolumeControl } from "@/components/VolumeControl";
 import { ChangeSound } from "@/components/ChangeSound";
 import '../../styles/globals.css'
@@ -10,7 +9,7 @@ export default function Home() {
 
         <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-black via-gray-800 to-red-900 p-10 pt-20 text-white">
           {/* Main Metronome Component */}
-          <Metronome />
+          <Metronome/>
           <VolumeControl />
           <ChangeSound />
         </main>  
