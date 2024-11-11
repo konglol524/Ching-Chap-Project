@@ -45,8 +45,8 @@ export default function About() {
             </p>
           </div>
 
-          {/* BPM Button (Centered) */}
-          <div className="flex flex-col items-center col-span-1 sm:col-span-3">
+          {/* BPM Button */}
+          <div className="flex flex-col items-center col-span-1 sm:col-span-1">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-gradient-to-br from-blue-600 to-red-400 shadow-lg shadow-gray-700">
               BPM
             </div>
@@ -55,6 +55,21 @@ export default function About() {
             {t("About:BPMtext")}
             </p>
           </div>
+
+
+          {/* BPM Adjuster */}
+          <div className="flex flex-col items-center col-span-1 sm:col-span-1">
+            <div className="mb-4 relative w-16 h-16 bg-gray-800 rounded-full shadow-lg border border-gray-600 flex items-center justify-center">
+              <div className="absolute w-full h-full rounded-full border-4 border-gray-700"></div>
+              <div className="absolute w-2 h-8 bg-red-500 rounded-full" style={{ transform: "rotate(0deg)", top: "50%", transformOrigin: "center bottom" }}></div>
+              <div className="absolute w-2 h-8 bg-yellow-400 rounded-full" style={{ transform: "rotate(0deg)", top: "50%", transformOrigin: "center bottom" }}></div>
+            </div>
+            <p className="text-xl font-semibold">{t("About:AdjButton")}</p>
+            <p className="text-center text-sm">
+            {t("About:Adjtext")}
+            </p>
+          </div>
+
         </div>
       </div>
 

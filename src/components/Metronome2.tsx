@@ -42,7 +42,13 @@ export const Metronome = () => {
   }, [isPlaying]);
 
   useEffect(()=>{
-    lengthRef.current = length;
+    if(length){
+      lengthRef.current = length;
+      if(60000 / length < 5){
+        stop();
+      }      
+    }
+
   }, [length])
 
   const playSound = (buffer: AudioBuffer | null) => {
