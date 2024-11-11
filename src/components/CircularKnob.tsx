@@ -62,6 +62,7 @@ export const CircularKnob = ({ length, value, min, max, onChange, className = ""
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
     handleStart(touch.clientX, touch.clientY);
+    e.preventDefault();
   };
 
   const handleEnd = () => {
@@ -119,13 +120,14 @@ export const CircularKnob = ({ length, value, min, max, onChange, className = ""
   const handleTouchMove = (e: TouchEvent) => {
     const touch = e.touches[0];
     handleMove(touch.clientX, touch.clientY);
+    e.preventDefault(); // Prevents the page from scrolling on touch devices
   };
 
   useEffect(() => {
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleEnd);
-      document.addEventListener("touchmove", handleTouchMove);
+      document.addEventListener("touchmove", handleTouchMove, { passive: false }); // Disable passive to prevent scrolling
       document.addEventListener("touchend", handleEnd);
     } else {
       document.removeEventListener("mousemove", handleMouseMove);
