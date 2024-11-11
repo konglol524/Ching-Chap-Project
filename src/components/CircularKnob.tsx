@@ -10,7 +10,7 @@ interface CircularKnobProps {
   className?: string;
 }
 
-export const CircularKnob = ({length, value, min, max, onChange, className = "" }: CircularKnobProps) => {
+export const CircularKnob = ({ length, value, min, max, onChange, className = "" }: CircularKnobProps) => {
   const knobRef = useRef<HTMLDivElement>(null);
   const [angle, setAngle] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -33,18 +33,18 @@ export const CircularKnob = ({length, value, min, max, onChange, className = "" 
   }, [value, min, max]);
 
   useEffect(() => {
-    if(length){
+    if (length) {
       setAngle(mapValueToAngle(60000 / length, min, max));
     }
   }, [length, min, max]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleStart = (clientX: number, clientY: number) => {
     if (knobRef.current) {
       const rect = knobRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      const deltaX = e.clientX - centerX;
-      const deltaY = e.clientY - centerY;
+      const deltaX = clientX - centerX;
+      const deltaY = clientY - centerY;
       let initialAngle = Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90;
       initialAngle = initialAngle < 0 ? initialAngle + 360 : initialAngle;
       
@@ -52,10 +52,19 @@ export const CircularKnob = ({length, value, min, max, onChange, className = "" 
       setIsDragging(true);
       setPrevAngle(initialAngle);
     }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    handleStart(e.clientX, e.clientY);
     e.preventDefault();
   };
 
-  const handleMouseUp = () => {
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    handleStart(touch.clientX, touch.clientY);
+  };
+
+  const handleEnd = () => {
     setIsDragging(false);
   };
 
@@ -66,35 +75,29 @@ export const CircularKnob = ({length, value, min, max, onChange, className = "" 
     return 4;
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMove = (clientX: number, clientY: number) => {
     if (isDragging && knobRef.current) {
       const rect = knobRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      const deltaX = e.clientX - centerX;
-      const deltaY = e.clientY - centerY;
+      const deltaX = clientX - centerX;
+      const deltaY = clientY - centerY;
 
       const currentQuadrant = getQuadrant(deltaX, deltaY);
       let newAngle = Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90;
       newAngle = newAngle < 0 ? newAngle + 360 : newAngle;
 
-      // Calculate the shortest distance between angles
       let angleDiff = newAngle - prevAngle;
       if (angleDiff > 180) angleDiff -= 360;
       if (angleDiff < -180) angleDiff += 360;
 
-      // Prevent large angle jumps
       if (Math.abs(angleDiff) > 90) {
         return;
       }
 
-      // Calculate new proposed angle
       let proposedAngle = angle + angleDiff;
-
-      // Clamp the angle between 0 and 360
       proposedAngle = Math.max(0, Math.min(360, proposedAngle));
 
-      // Update angles only if we haven't hit the limits or we're moving away from them
       if (
         (proposedAngle > 0 && proposedAngle < 360) || 
         (proposedAngle === 0 && angleDiff > 0) ||
@@ -109,18 +112,33 @@ export const CircularKnob = ({length, value, min, max, onChange, className = "" 
     }
   };
 
+  const handleMouseMove = (e: MouseEvent) => {
+    handleMove(e.clientX, e.clientY);
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    const touch = e.touches[0];
+    handleMove(touch.clientX, touch.clientY);
+  };
+
   useEffect(() => {
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("mouseup", handleEnd);
+      document.addEventListener("touchmove", handleTouchMove);
+      document.addEventListener("touchend", handleEnd);
     } else {
       document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mouseup", handleEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleEnd);
     }
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mouseup", handleEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleEnd);
     };
   }, [isDragging, angle, prevAngle]);
 
@@ -129,6 +147,7 @@ export const CircularKnob = ({length, value, min, max, onChange, className = "" 
       ref={knobRef}
       className={`relative w-24 h-24 ${className} bg-gray-800 rounded-full shadow-lg border border-gray-600 flex items-center justify-center`}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       <div className="absolute w-full h-full rounded-full border-4 border-gray-700"></div>
       <div
