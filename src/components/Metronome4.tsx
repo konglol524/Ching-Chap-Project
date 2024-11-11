@@ -6,7 +6,7 @@ import { requestWakeLock } from "@/utils/wakelock";
 import { useTranslation } from "next-i18next";
 import { CircularKnob } from "./CircularKnob";
 
-export const Metronome4 = () => {
+export const Metronome = () => {
   const { t } = useTranslation();
   const audioCtx = useContext(AudioContext);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);

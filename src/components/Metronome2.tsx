@@ -4,7 +4,7 @@ import { AudioContext } from "./AudioContextProvider";
 import { Music, Square, Lock, Unlock } from "lucide-react";
 import { requestWakeLock } from "@/utils/wakelock";
 
-export const Metronome2 = () => {
+export const Metronome = () => {
   const audioCtx = useContext(AudioContext);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);

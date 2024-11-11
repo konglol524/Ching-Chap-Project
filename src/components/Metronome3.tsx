@@ -5,7 +5,7 @@ import { Music, Square, Lock, Unlock } from "lucide-react";
 import { requestWakeLock } from "@/utils/wakelock";
 import { useTranslation } from "next-i18next";
 
-export const Metronome3 = () => {
+export const Metronome = () => {
   const { t } = useTranslation();
   const audioCtx = useContext(AudioContext);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
