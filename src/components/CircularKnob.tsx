@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 
 interface CircularKnobProps {
+  length: number | null;
   value: number;
   min: number;
   max: number;
@@ -9,7 +10,7 @@ interface CircularKnobProps {
   className?: string;
 }
 
-export const CircularKnob = ({ value, min, max, onChange, className = "" }: CircularKnobProps) => {
+export const CircularKnob = ({length, value, min, max, onChange, className = "" }: CircularKnobProps) => {
   const knobRef = useRef<HTMLDivElement>(null);
   const [angle, setAngle] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -30,6 +31,12 @@ export const CircularKnob = ({ value, min, max, onChange, className = "" }: Circ
   useEffect(() => {
     setAngle(mapValueToAngle(value, min, max));
   }, [value, min, max]);
+
+  useEffect(() => {
+    if(length){
+      setAngle(mapValueToAngle(60000 / length, min, max));
+    }
+  }, [length, min, max]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (knobRef.current) {
@@ -125,7 +132,7 @@ export const CircularKnob = ({ value, min, max, onChange, className = "" }: Circ
     >
       <div className="absolute w-full h-full rounded-full border-4 border-gray-700"></div>
       <div
-        className="absolute w-1 h-12 bg-red-500 rounded-full"
+        className="absolute w-2 h-12 bg-red-500 rounded-full"
         style={{ transform: "rotate(0deg)", top: "50%", transformOrigin: "center bottom" }}
       ></div>      
       <div

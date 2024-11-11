@@ -74,6 +74,7 @@ export const Metronome = () => {
   const handleTap = () => {
     if (!audioCtx.current) return;
     audioCtx.current.audioContext?.resume();
+    currentSourceRef.current?.stop(); 
     const now = Date.now();
     if (isManual) stop();
     if (firstTap) {
@@ -148,12 +149,6 @@ export const Metronome = () => {
       if (bpmValue > 0) {
         const newLength = 60000 / bpmValue; // Convert BPM to milliseconds
         setLength(newLength); // Update length state
-        // if (isPlaying ) {
-        //     if (timeoutRef.current) {
-        //         clearTimeout(timeoutRef.current);
-        //     }
-        //     timeoutRef.current = setTimeout(play, newLength);
-        // }
       }
     } else {
       setLength(null); // Reset length if input is cleared
@@ -177,11 +172,11 @@ export const Metronome = () => {
   };
 
   return (
-    <div className="text-center mt-5">
-      <p className="text-select-none text-xl font-semibold mb-5 sm:text-4xl">
+    <div className="text-select-none text-center mt-5">
+      <p className=" text-xl font-semibold mb-5 sm:text-4xl">
         {isManual ? t("Manual mode") : isPlaying ? t("Press stop to end") : t("Press twice to begin")}
       </p>
-      <div className="flex flex-col items-center space-y-7 sm:space-y-10">
+      <div className="text-select-none flex flex-col items-center space-y-7 sm:space-y-8">
         <TapButton isPlaying={isPlaying} isManual={isManual} firstTap={firstTap} handleTap={handleTap} />
         <StopButton isPlaying={isPlaying} handleStop={handleStop} />
 
@@ -197,7 +192,7 @@ export const Metronome = () => {
         </div>
 
         <BPMDisplay length={length} bpmInput={bpmInput} setBpmInput={setBpmInput} />
-        <BPMKnob bpmKnobValue={bpmKnobValue} handleBpmChange={handleBpmChange} />
+        <BPMKnob length={length} bpmKnobValue={bpmKnobValue} handleBpmChange={handleBpmChange} />
       </div>
     </div>
   );
