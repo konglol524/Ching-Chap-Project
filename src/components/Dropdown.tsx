@@ -41,13 +41,6 @@ export const DropdownNavigator = () => {
                       {t("Nav:currentVersion")}
                     </a>
                     <a
-                      href="/v1"
-                      className="block px-4 py-2 text-sm text-white hover:bg-red-700 hover:text-white transition-colors duration-200"
-                      role="menuitem"
-                    >
-                      {t("Nav:version1")}
-                    </a>
-                    <a
                       href="/about"
                       className="block px-4 py-2 text-sm text-white hover:bg-red-700 hover:text-white transition-colors duration-200"
                       role="menuitem"

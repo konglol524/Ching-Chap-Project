@@ -3,11 +3,9 @@ import { useTranslation } from "next-i18next";
 
 interface BPMDisplayProps {
     length: number | null;
-    bpmInput: number | null;
-    setBpmInput: (value: number) => void;
   }
   
-export const BPMDisplay: React.FC<BPMDisplayProps> = ({ length, bpmInput, setBpmInput }) => {
+export const BPMDisplay: React.FC<BPMDisplayProps> = ({ length}) => {
   const { t } = useTranslation();  
   return (
       <div className="text-center space-y-2">

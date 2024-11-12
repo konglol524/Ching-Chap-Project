@@ -1,4 +1,4 @@
-import {Metronome} from "@/components/Metronome2"
+import {Metronome} from "@/components/Metronome"
 import { VolumeControl } from "@/components/VolumeControl";
 import { ChangeSound } from "@/components/ChangeSound";
 import '../../styles/globals.css'

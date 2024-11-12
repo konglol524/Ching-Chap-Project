@@ -1,174 +1,201 @@
 "use client";
-import { useContext, useState, useRef, useCallback, useEffect } from "react";
-import { AudioContext, initAudioContext } from "./AudioContextProvider";
-import { Music, Square, Lock, Unlock } from "lucide-react";
+import { useContext, useState, useRef, useEffect } from "react";
+import { AudioContext, AudioContextType } from "./AudioContextProvider";
 import { requestWakeLock } from "@/utils/wakelock";
+import { useTranslation } from "next-i18next";
+import {TapButton} from "./TapButton";
+import { StopButton } from "./StopButton";
+import { ManualButton } from "./ManualButton";
+import { BPMDisplay } from "./BPMDisplay";
+import { BPMKnob } from "./BPMKnob";
 
 export const Metronome = () => {
-  
-  const audioCtx = useContext(AudioContext);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const currentSourceRef = useRef<AudioBufferSourceNode | null>(null); 
+  const { t } = useTranslation();
+  const audioCtxConfig = useContext(AudioContext);
+  const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isChap = useRef<boolean>(false);
+  const stopRequested = useRef<boolean>(false);
+  const audioCtx = useRef<AudioContextType | null>(null);
+
+  useEffect(()=>{
+    audioCtx.current = audioCtxConfig
+  }, [audioCtxConfig])
 
   const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);  
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isChap, setIsChap] = useState(false);
   const [isManual, setIsManual] = useState(false);
   const [tap1, setTap1] = useState<number | null>(null);
   const [tap2, setTap2] = useState<number | null>(null);
+  const [firstTap, setTap] = useState(true);
   const [length, setLength] = useState<number | null>(0);
-  const [stopRequested, setStopRequested] = useState(false);
-
-
-  const playSound = useCallback((buffer: AudioBuffer | null) => {
-
-    if (!audioCtx?.audioContext || !buffer || !audioCtx.gainNode) return;
-
-    if(currentSourceRef.current){
-        currentSourceRef.current.stop(); //stop sound before playing new sound
-    }
-    const source = audioCtx.audioContext.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioCtx.gainNode);
-    audioCtx.gainNode.connect(audioCtx.audioContext.destination);
-    source.start(0);
-    currentSourceRef.current = source;
-  }, [audioCtx]);
-
-  const play = useCallback(() => {
-    if (!audioCtx?.audioContext) return;
-    if (isChap) {
-        playSound(audioCtx.chapBuffer); // Play Chap sound
-        if (stopRequested) {
-          stop();
-        } 
-    } else {
-      if (stopRequested) {
-        stop();
-      } else {
-        playSound(audioCtx.chingBuffer); // Play Ching sound
-      }
-    }
-    setIsChap((prev) => !prev);
-  }, [isChap]);
-
-  const handleTap = () => {
-    if(!audioCtx) return;
-    if(isManual){
-      stop();
-    }
-
-    if (!isPlaying) {
-      if (tap1 === null) {
-        setTap1(Date.now());
-        playSound(audioCtx.chingBuffer);
-        setIsChap(true);
-      } else {
-        setTap2(Date.now());
-        playSound(audioCtx.chapBuffer); // Second tap plays chap
-        setIsChap(false); // Next sound will be ching
-      }
-    } else {
-      if (tap1 && tap2){
-        if(currentSourceRef.current){
-          currentSourceRef.current.stop(); //stop sound before playing new sound
-        }
-        stop(); //stop beat
-        setTap1(Date.now());
-        playSound(audioCtx.chingBuffer);
-        setIsChap(true);
-      } else if (tap1 && !tap2){
-        setTap2(Date.now());
-        playSound(audioCtx.chapBuffer); // Second tap plays chap
-        setIsChap(false); // Next sound will be ching
-      }
-    }
-
-  };
-
-  const startChingChap = useCallback(() => {
-    if(!tap1 || !tap2) return;
-    const newInterval = Math.max(tap2 - tap1, 0);
-    setLength(newInterval);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    intervalRef.current = setInterval(play, newInterval);
-    setIsPlaying(true);
-    requestWakeLock(setWakeLock);
-  }, [play, tap1, tap2]);
+  const [bpmKnobValue, setBpmKnobValue] = useState<number>(120); // State for BPM knob
+  const isPlayingRef = useRef(isPlaying);
+  const lengthRef = useRef(length);
 
   useEffect(() => {
-    if ( tap1 !== null && tap2 !== null) {
-        startChingChap();  
-    }
-  }, [tap2, startChingChap]);
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
-  const handleStop = () => {
-    if (isPlaying) {
-        setStopRequested((prev)=>(true));
-        console.log("Stop requested, will stop after next CHAP");
-      }
+  useEffect(()=>{
+    if(length){
+      lengthRef.current = length;
+      if(60000 / length < 5){
+        stop();
+      }      
+    }
+
+  }, [length])
+
+  const playSound = (buffer: AudioBuffer | null) => {
+    if (!audioCtx.current?.audioContext || !buffer || !audioCtx.current.gainNode) return;
+    currentSourceRef.current?.stop(); // Stop previous sound
+    const source = audioCtx.current.audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.current.gainNode).connect(audioCtx.current.audioContext.destination);
+    source.start(0);
+    currentSourceRef.current = source;
   };
 
+  const play = () => {
+    if (!audioCtx.current?.audioContext || !lengthRef.current) return;
+    if (!isChap.current && stopRequested.current) {
+      stop();
+    } else {
+        playSound(isChap.current ? audioCtx.current.chapBuffer : audioCtx.current.chingBuffer);  
+        if(isPlayingRef.current){
+            timeoutRef.current = setTimeout(() => {
+                play();
+            }, lengthRef.current);        
+        }      
+    }
+    isChap.current = !isChap.current;
+
+  };
+
+  const handleTap = () => {
+    if (!audioCtx.current) return;
+    audioCtx.current.audioContext?.resume();
+    currentSourceRef.current?.stop(); 
+    const now = Date.now();
+    if (isManual) stop();
+    if (firstTap) {
+      stop();
+      setTap1(now);
+      playSound(audioCtx.current.chingBuffer);
+    } else {
+      setTap2(now);
+      playSound(audioCtx.current.chapBuffer);
+    }
+    setTap((prev) => !prev);
+  };
+
+  const startChingChap = () => {
+    if (!tap1 || !tap2) return;
+    const newInterval = Math.max(tap2 - tap1, 0);
+    requestWakeLock(setWakeLock);
+        //change to set timeout
+    setIsPlaying(true);     
+    setLength(newInterval);
+    if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(play, newInterval);
+    
+  };
+
+  useEffect(() => {
+    //change to set timeout
+    if (tap1 !== null && tap2 !== null) {
+        startChingChap();
+      } 
+  }, [tap2]);
+
   const stop = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+    if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
     }
     setIsPlaying(false);
     setTap1(null);
     setTap2(null);
-    setIsChap(false);
-    setStopRequested(false);
+    isChap.current = false;
+    stopRequested.current = false;
     if (wakeLock) {
       wakeLock.release();
     }
   };
 
-  const handleManual = useCallback(()=> {
-    if(isManual){
-      setIsPlaying((prev)=> false);
+  const handleStop = () => {
+    if (isPlaying) {
+      stopRequested.current = true;
     }
-    setIsManual((prevManual) => !prevManual)
-  }, []);
+  };
+
+  const handleManual = () => {
+    if (isPlaying) {
+        if(isChap.current){
+            setTap(false)
+        } else {
+            setTap(true)
+        }
+      //const lastSound = isChap.current
+      stop();
+      //isChap.current = lastSound
+    }
+    setIsManual((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const bpmValue = bpmKnobValue;
+    if (bpmValue && !isNaN(Number(bpmValue))) {
+      if (bpmValue > 0) {
+        const newLength = 60000 / bpmValue; // Convert BPM to milliseconds
+        setLength(newLength); // Update length state
+      }
+    } else {
+      setLength(null); // Reset length if input is cleared
+    }
+  }, [ bpmKnobValue]);
+
+  const startFromBpm = () => {
+    if (!audioCtx.current) return;
+    stop();
+    audioCtx.current.audioContext?.resume();
+    if (!length) return;
+    setIsManual(false);
+    playSound(audioCtx.current.chingBuffer);
+    isChap.current = true;
+    setTap1(Date.now());
+    setTap2(Date.now() + length);
+  };
+
+  const handleBpmChange = (value: number) => {
+    setBpmKnobValue(value);
+  };
 
   return (
-    <div>
-      <p className="text-3xl font-semibold mb-4 sm:text-4xl">
-        {isManual ? "Manual mode": isPlaying ?"Press stop to end" : "Press twice to begin"}
+    <div className="text-select-none text-center mt-5">
+      <p className=" text-xl font-semibold mb-5 sm:text-4xl">
+        {isManual ? t("Manual mode") : isPlaying ? t("Press stop to end") : t("Press twice to begin")}
       </p>
-      <div className="flex flex-col items-center space-y-8">
+      <div className="text-select-none flex flex-col items-center space-y-7 sm:space-y-8">
+        <TapButton isPlaying={isPlaying} isManual={isManual} firstTap={firstTap} handleTap={handleTap} />
+        <StopButton isPlaying={isPlaying} handleStop={handleStop} />
+
+        <div className="flex items-center justify-center space-x-10">
+        <ManualButton handleManual={handleManual} isManual={isManual} />
         <button
-          className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 ${
-            isManual ? "bg-yellow-500 hover:bg-yellow-600": isPlaying? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"
-          } `}
-          onClick={handleTap}
+          className="text-select-none w-12 h-12 rounded-full flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 bg-gradient-to-br from-blue-600 to-red-400 shadow-lg shadow-gray-800"
+          onClick={startFromBpm}
         >
-            <Music size={48} />
+          BPM
         </button>
-        <button
-          className="w-24 h-24 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95"
-          onClick={handleStop}
-        >
-          <Square size={36} />
-        </button>
-          <button
-            className={` w-8 h-8 rounded-full flex items-center justify-center text-xl 
-            font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95
-            ${isManual ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"}`}
-            onClick={handleManual}>
-            {isManual ? <Lock size={20} /> : <Unlock size={20} />}
-          </button>
-        <div className="text-center">
-          <p className="text-2xl font-semibold">Current Tempo</p>
-          <p className="text-4xl font-bold">
-            {length ? `${(length / 1000).toFixed(2)} second` : "--"}
-          </p>
-          <p className="text-xl">{length ? `${Math.round(60000 / length)} BPM` : "--"}</p>
+            
         </div>
 
+        <BPMDisplay length={length} />
+        <BPMKnob length={length} bpmKnobValue={bpmKnobValue} handleBpmChange={handleBpmChange} />
       </div>
-
     </div>
   );
 };

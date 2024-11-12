@@ -22,10 +22,10 @@ export const CircularKnob = ({ length, value, min, max, onChange, className = ""
   };
 
   const mapAngleToValue = (angle: number, min: number, max: number) => {
-    return Math.min(
+    return Math.round(Math.min(
       max,
       Math.max(min, (angle / 360) * (max - min) + min)
-    );
+    ));
   };
 
   useEffect(() => {
@@ -153,11 +153,11 @@ export const CircularKnob = ({ length, value, min, max, onChange, className = ""
     >
       <div className="absolute w-full h-full rounded-full border-4 border-gray-700"></div>
       <div
-        className="absolute w-2 h-12 bg-red-500 rounded-full"
+        className="absolute w-1 h-12 bg-red-500 rounded-full"
         style={{ transform: "rotate(0deg)", top: "50%", transformOrigin: "center bottom" }}
       ></div>      
       <div
-        className="absolute w-2 h-12 bg-yellow-400 rounded-full"
+        className="absolute w-2 h-12 bg-yellow-400 border-black border-2 rounded-full"
         style={{ transform: `rotate(${angle}deg)`, top: "50%", transformOrigin: "center top" }}
       ></div>
     </div>

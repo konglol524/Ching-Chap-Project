@@ -24,6 +24,7 @@ className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font
       )
   }`}
       onClick={handleTap}
+      onTouchStart={handleTap}
     >
       <Music size={48} />
     </button>
