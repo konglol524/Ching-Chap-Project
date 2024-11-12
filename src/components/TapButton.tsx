@@ -33,6 +33,7 @@ export const TapButton: React.FC<TapButtonProps> = ({
         }`}
         onClick={useTap ? undefined : handleTap}
         onTouchStart={useTap ? handleTap : undefined}
+        onTouchEnd={useTap ? handleTap : undefined}
       >
         <Music size={48} />
       </button>
@@ -40,7 +41,7 @@ export const TapButton: React.FC<TapButtonProps> = ({
       {/* Toggle to switch between tap and click */}
       <div className="flex items-center space-x-2">
         <label htmlFor="tap-toggle" className="text-lg font-medium">
-          Use {useTap ? "Touch" : "Click"}
+          Use {useTap ? "Touch (Mobile)" : "Click"}
         </label>
         <input
           id="tap-toggle"
