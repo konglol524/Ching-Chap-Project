@@ -91,7 +91,7 @@ export const Metronome = () => {
 
   const startChingChap = () => {
     if (!tap1 || !tap2) return;
-    const newInterval = Math.max(tap2 - tap1, 0);
+    const newInterval = Math.max(tap2 - tap1, 15);
     requestWakeLock(setWakeLock);
         //change to set timeout
     setIsPlaying(true);     
