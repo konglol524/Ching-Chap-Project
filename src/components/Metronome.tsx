@@ -91,7 +91,7 @@ export const Metronome = () => {
 
   const startChingChap = () => {
     if (!tap1 || !tap2) return;
-    const newInterval = Math.max(tap2 - tap1, 15);
+    const newInterval = Math.max(tap2 - tap1, 150); //limit max bpm by setting min length
     requestWakeLock(setWakeLock);
         //change to set timeout
     setIsPlaying(true);     
