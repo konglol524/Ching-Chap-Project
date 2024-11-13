@@ -31,8 +31,8 @@ export const TapButton: React.FC<TapButtonProps> = ({
       {/* Toggle to switch between tap and click, only shown on mobile */}
       {isMobile && (
         <div className="flex items-center space-x-2">
-          <label htmlFor="tap-toggle" className="text-lg font-medium">
-            {useHold ? t("Hold") : t("Touch")}
+          <label htmlFor="tap-toggle" className="text-xl font-semibold mb-5 sm:text-4xl">
+            {isManual ? t("Manual mode") : useHold ? t("Hold") : t("Touch")}
           </label>
           <input
             id="tap-toggle"
@@ -43,7 +43,15 @@ export const TapButton: React.FC<TapButtonProps> = ({
           />
         </div>
       )}
-
+      {
+        !isMobile && (
+          <div className="flex items-center space-x-2">
+          <label htmlFor="tap-toggle" className="text-xl font-semibold mb-5 sm:text-4xl">
+             {isManual ? t("Manual mode") : t("Touch") }
+          </label>
+        </div>
+        )
+      }
       <button
         className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-transform duration-200 ease-in-out transform hover:scale-105 active:scale-95 ${
           isManual

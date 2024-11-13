@@ -174,9 +174,6 @@ export const Metronome = () => {
 
   return (
     <div className="text-select-none text-center mt-5">
-      <p className=" text-xl font-semibold mb-5 sm:text-4xl">
-        {isManual ? t("Manual mode") : isPlaying ? t("Press stop to end") : t("Press twice to begin")}
-      </p>
       <div className="text-select-none flex flex-col items-center space-y-7 sm:space-y-8">
         <TapButton isPlaying={isPlaying} isManual={isManual} firstTap={firstTap} handleTap={handleTap} />
         <StopButton isPlaying={isPlaying} handleStop={handleStop} />
