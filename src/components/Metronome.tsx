@@ -6,7 +6,6 @@ import { useTranslation } from "next-i18next";
 import {TapButton} from "./TapButton";
 import { StopButton } from "./StopButton";
 import { ManualButton } from "./ManualButton";
-import { BPMDisplay } from "./BPMDisplay";
 import { BPMKnob } from "./BPMKnob";
 
 export const Metronome = () => {
@@ -192,8 +191,6 @@ export const Metronome = () => {
         </button>
             
         </div>
-
-        <BPMDisplay length={length} />
         <BPMKnob length={length} bpmKnobValue={bpmKnobValue} handleBpmChange={handleBpmChange} />
       </div>
     </div>
