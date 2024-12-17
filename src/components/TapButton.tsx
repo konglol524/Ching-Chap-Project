@@ -16,14 +16,13 @@ export const TapButton: React.FC<TapButtonProps> = ({
   handleTap,
 }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [useHold, setUseHold] = useState(true);
+  const [useHold, setUseHold] = useState(false);
   const { t } = useTranslation();
 
   // Detect if the user is on a mobile device
   useEffect(() => {
     const mobileCheck = window.matchMedia("(pointer: coarse)").matches;
     setIsMobile(mobileCheck);
-    setUseHold(mobileCheck); // Default to true on mobile, false on desktop
   }, []);
 
   return (
