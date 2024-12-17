@@ -8,6 +8,8 @@ import { StopButton } from "./StopButton";
 import { ManualButton } from "./ManualButton";
 import { BPMKnob } from "./BPMKnob";
 import { Visualizer } from "./Visualizer";
+import { BPMDropdown } from "./BPMDropdown";
+
 
 export const Metronome = () => {
   const { t } = useTranslation();
@@ -197,6 +199,8 @@ export const Metronome = () => {
         <BPMKnob length={length} bpmKnobValue={bpmKnobValue} handleBpmChange={handleBpmChange} />
         {/* <Visualizer isPlaying={isPlaying} length={length} /> */}
       </div>
+      <BPMDropdown onBpmChange={handleBpmChange} currentBpm={bpmKnobValue} />
+
     </div>
   );
 };

@@ -151,8 +151,11 @@ export const CircularKnob = ({ length, value, min, max, onChange, className = ""
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
-      <div className="absolute w-full h-full rounded-full border-4 border-gray-700"></div>
       <div
+        className={`absolute w-full h-full rounded-full border-4 ${
+          isDragging ? "border-blue-500" : "border-gray-700"
+        }`}
+      ></div>      <div
         className="absolute w-1 h-12 bg-red-500 rounded-full"
         style={{ transform: "rotate(0deg)", top: "50%", transformOrigin: "center bottom" }}
       ></div>      
