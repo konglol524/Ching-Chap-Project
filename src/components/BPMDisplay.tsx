@@ -16,7 +16,7 @@ export const BPMDisplay: React.FC<BPMDisplayProps> = ({ length}) => {
         <div className="text-select-none flex space-x-1 items-center justify-center">
         <input
           type="number"
-          value={length ? Math.round(60000 / length) : ""}
+          value={length ? (60000 / length).toFixed(2) : ""}
           readOnly
           placeholder="---"
           className="text-select-none text-xl font-bold w-16 text-center p-1 border border-gray-300 rounded-md text-black pointer-events-none"

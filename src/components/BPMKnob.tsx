@@ -19,7 +19,7 @@ export const BPMKnob: React.FC<BPMKnobProps> = ({ length, bpmKnobValue, handleBp
 
     useEffect(()=>{
       if(length){
-        setBPM(Math.round(60000 / length))
+        setBPM(Math.round(60000 * 10 / length ) / 10)
       }
     }, [length])
 
@@ -35,11 +35,11 @@ export const BPMKnob: React.FC<BPMKnobProps> = ({ length, bpmKnobValue, handleBp
           <CircularKnob
             length={length}
             value={bpmKnobValue}
-            min={1}
-            max={400}
+            min={10}
+            max={250}
             onChange={handleBpmChange}
           />
-          <p className="text-select-none text-xl font-bold">{bpmText.toFixed(0)} BPM</p>
+          <p className="text-select-none text-xl font-bold">{bpmText.toFixed(1)} BPM</p>
         </div>
         </div>
       </div>

@@ -25,7 +25,7 @@ export const CircularKnob = ({ length, value, min, max, onChange, className = ""
     return Math.round(Math.min(
       max,
       Math.max(min, (angle / 360) * (max - min) + min)
-    ));
+    )* 10) / 10;
   };
 
   useEffect(() => {

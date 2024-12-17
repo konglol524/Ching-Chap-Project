@@ -7,13 +7,15 @@ import {TapButton} from "./TapButton";
 import { StopButton } from "./StopButton";
 import { ManualButton } from "./ManualButton";
 import { BPMKnob } from "./BPMKnob";
+import { Visualizer } from "./Visualizer";
 
 export const Metronome = () => {
   const { t } = useTranslation();
   const audioCtxConfig = useContext(AudioContext);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isChap = useRef<boolean>(false);
+
+
   const stopRequested = useRef<boolean>(false);
   const audioCtx = useRef<AudioContextType | null>(null);
 
@@ -31,19 +33,22 @@ export const Metronome = () => {
   const [bpmKnobValue, setBpmKnobValue] = useState<number>(120); // State for BPM knob
   const isPlayingRef = useRef(isPlaying);
   const lengthRef = useRef(length);
+  const [isChap, setIsChap] = useState<boolean>(false);
+  const isChapRef = useRef<boolean>(isChap);
+
 
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
 
+  useEffect(() => {
+    isChapRef.current = isChap;
+  }, [isChap]);
+
   useEffect(()=>{
     if(length){
-      lengthRef.current = length;
-      if(60000 / length < 5){
-        stop();
-      }      
+      lengthRef.current = length; 
     }
-
   }, [length])
 
   const playSound = (buffer: AudioBuffer | null) => {
@@ -58,17 +63,17 @@ export const Metronome = () => {
 
   const play = () => {
     if (!audioCtx.current?.audioContext || !lengthRef.current) return;
-    if (!isChap.current && stopRequested.current) {
+    if (!isChapRef.current && stopRequested.current) {
       stop();
     } else {
-        playSound(isChap.current ? audioCtx.current.chapBuffer : audioCtx.current.chingBuffer);  
+        playSound(isChapRef.current ? audioCtx.current.chapBuffer : audioCtx.current.chingBuffer);  
         if(isPlayingRef.current){
             timeoutRef.current = setTimeout(() => {
                 play();
             }, lengthRef.current);        
         }      
     }
-    isChap.current = !isChap.current;
+    setIsChap(!isChapRef.current);
 
   };
 
@@ -91,7 +96,7 @@ export const Metronome = () => {
 
   const startChingChap = () => {
     if (!tap1 || !tap2) return;
-    const newInterval = Math.max(tap2 - tap1, 150); //limit max bpm by setting min length
+    const newInterval = Math.max(tap2 - tap1, 240); //limit max bpm by setting min length
     requestWakeLock(setWakeLock);
         //change to set timeout
     setIsPlaying(true);     
@@ -117,7 +122,7 @@ export const Metronome = () => {
     setIsPlaying(false);
     setTap1(null);
     setTap2(null);
-    isChap.current = false;
+    setIsChap(false);
     stopRequested.current = false;
     if (wakeLock) {
       wakeLock.release();
@@ -132,14 +137,12 @@ export const Metronome = () => {
 
   const handleManual = () => {
     if (isPlaying) {
-        if(isChap.current){
+        if(isChapRef.current){
             setTap(false)
         } else {
             setTap(true)
         }
-      //const lastSound = isChap.current
       stop();
-      //isChap.current = lastSound
     }
     setIsManual((prev) => !prev);
   };
@@ -163,7 +166,7 @@ export const Metronome = () => {
     if (!length) return;
     setIsManual(false);
     playSound(audioCtx.current.chingBuffer);
-    isChap.current = true;
+    setIsChap(true);
     setTap1(Date.now());
     setTap2(Date.now() + length);
   };
@@ -174,12 +177,15 @@ export const Metronome = () => {
 
   return (
     <div className="text-select-none text-center mt-5">
+      
       <div className="text-select-none flex flex-col items-center space-y-7 sm:space-y-8">
         <TapButton isPlaying={isPlaying} isManual={isManual} firstTap={firstTap} handleTap={handleTap} />
         <StopButton isPlaying={isPlaying} handleStop={handleStop} />
 
-        <div className="flex items-center justify-center space-x-10">
+        <div className="flex items-center justify-center space-x-6">
         <ManualButton handleManual={handleManual} isManual={isManual} />
+        <Visualizer isPlaying={isPlaying} length={length} isChap={isChap} />
+
         <button
           className="text-select-none w-12 h-12 rounded-full flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 bg-gradient-to-br from-blue-600 to-red-400 shadow-lg shadow-gray-800"
           onClick={startFromBpm}
@@ -189,6 +195,7 @@ export const Metronome = () => {
             
         </div>
         <BPMKnob length={length} bpmKnobValue={bpmKnobValue} handleBpmChange={handleBpmChange} />
+        {/* <Visualizer isPlaying={isPlaying} length={length} /> */}
       </div>
     </div>
   );
