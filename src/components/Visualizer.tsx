@@ -16,7 +16,7 @@ export const Visualizer: FC<VisualizerProps> = ({ isPlaying, length, isChap }) =
     } else {
       setPosition("left"); // Reset position when stopped
     }
-  }, [isChap, isPlaying, length]);
+  }, [isChap, isPlaying]);
 
   return (
     <div className="flex flex-col items-center mt-5 space-y-4">
@@ -41,7 +41,7 @@ export const Visualizer: FC<VisualizerProps> = ({ isPlaying, length, isChap }) =
             transform: "translate(-50%, 0)",
             transition: isPlaying
               ? `left ${length ? length  : 0}ms linear`
-              : "none", // Move duration matches half the beat length
+              : "none", 
           }}
         ></div>
       </div>
