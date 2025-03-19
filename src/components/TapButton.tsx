@@ -27,30 +27,20 @@ export const TapButton: React.FC<TapButtonProps> = ({
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      {/* Toggle to switch between tap and click, only shown on mobile */}
-      {isMobile && (
-        <div className="flex items-center space-x-2">
-          <label htmlFor="tap-toggle" className="text-xl font-semibold sm:text-4xl">
-            {isManual ? t("Manual mode") : useHold ? t("Hold") : t("Touch")}
-          </label>
-          <input
-            id="tap-toggle"
-            type="checkbox"
-            checked={useHold}
-            onChange={() => setUseHold(!useHold)}
-            className="w-6 h-6 cursor-pointer"
-          />
-        </div>
-      )}
-      {
-        !isMobile && (
-          <div className="flex items-center space-x-2">
-          <label htmlFor="tap-toggle" className="text-xl font-semibold sm:text-4xl">
-             {isManual ? t("Manual mode") : t("Touch") }
-          </label>
-        </div>
-        )
-      }
+      {/* Toggle to switch between tap/click and hold - now shown on all platforms */}
+      <div className="flex items-center space-x-2">
+        <label htmlFor="tap-toggle" className="text-xl font-semibold sm:text-4xl">
+          {useHold ? t("Hold") : t("Touch")}
+        </label>
+        <input
+          id="tap-toggle"
+          type="checkbox"
+          checked={useHold}
+          onChange={() => setUseHold(!useHold)}
+          className="w-6 h-6 cursor-pointer"
+        />
+      </div>
+      
       <button
         className={`w-32 h-32 rounded-full flex items-center justify-center text-xl font-semibold transition-transform duration-200 ease-in-out transform hover:scale-105 active:scale-95 ${
           isManual
@@ -64,8 +54,10 @@ export const TapButton: React.FC<TapButtonProps> = ({
             : "bg-gradient-to-br from-yellow-600 to-yellow-400 shadow-lg shadow-yellow-700"
         }`}
         onClick={useHold ? undefined : handleTap}
-        onTouchStart={useHold ? handleTap : undefined}
-        onTouchEnd={useHold ? handleTap : undefined}
+        onMouseDown={useHold && !isMobile ? handleTap : undefined}
+        onMouseUp={useHold && !isMobile ? handleTap : undefined}
+        onTouchStart={useHold && isMobile ? handleTap : undefined}
+        onTouchEnd={useHold && isMobile ? handleTap : undefined}
       >
         <Music size={48} />
       </button>

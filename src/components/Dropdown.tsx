@@ -27,9 +27,12 @@ export const DropdownNavigator = () => {
       <header className="w-full bg-gradient-to-r from-gray-900 via-gray-800 to-red-900 bg-opacity-90 fixed top-0 left-0 right-0 z-10 shadow-lg">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           {/* Logo or Title */}
+          <Link href="/">
             <div className="text-select-none text-white text-md sm:text-2xl font-bold tracking-wide hover:text-red-600 transition-colors duration-300">
               {t("Nav:logo")}
+
             </div>
+          </Link>
       
           <div className="text-select-none flex items-center">
             {/* Dropdown Button */}
