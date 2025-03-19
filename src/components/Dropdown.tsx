@@ -1,15 +1,27 @@
 "use client";
 import { useTranslation } from "next-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react"; 
 import { LanguageToggle } from "./LanguageToggle";
 import Link from "next/link";
+import SignIn from "./sign-in";
+import { User } from "firebase/auth";
+import { checkUserExistence, onAuthStateChangedHelper} from "../firebase/firebase";
 
 export const DropdownNavigator = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { t } = useTranslation();
     const toggleDropdown = () => setIsOpen((prev) => !prev);
+    const [user, setUser] = useState<User | null>(null);
 
+    useEffect(() => {
+      const unsubscribe = onAuthStateChangedHelper(async (user) => {
+        await checkUserExistence(user);
+        setUser(user);
+      });
+      // Cleanup subscription on unmount
+      return () => unsubscribe();
+    }, [] /* No dependencies, never rerun */);
   
     return (
       <header className="w-full bg-gradient-to-r from-gray-900 via-gray-800 to-red-900 bg-opacity-90 fixed top-0 left-0 right-0 z-10 shadow-lg">
@@ -31,7 +43,7 @@ export const DropdownNavigator = () => {
     
               {/* Dropdown menu */}
               {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-gray-700 z-20">
+                <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-gray-700 z-20">
                   <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                     <a
                       href="/"
@@ -54,6 +66,7 @@ export const DropdownNavigator = () => {
     
             {/* Language Toggle Button */}
             <LanguageToggle/>
+            <SignIn user={user} />
           </div>
         </div>
       </header>

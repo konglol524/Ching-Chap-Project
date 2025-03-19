@@ -12,7 +12,8 @@ export default function Home() {
           <Metronome/>
           <VolumeControl />
           <ChangeSound />
-          
         </main>  
   );
 }
+
+
