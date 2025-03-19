@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState, useRef, useEffect } from "react";
+import { useContext, useState, useRef, useEffect, useCallback } from "react";
 import { AudioContext, AudioContextType } from "./AudioContextProvider";
 import { requestWakeLock } from "@/utils/wakelock";
 import { useTranslation } from "next-i18next";
@@ -173,9 +173,21 @@ export const Metronome = () => {
     setTap2(Date.now() + length);
   };
 
-  const handleBpmChange = (value: number) => {
-    setBpmKnobValue(value);
-  };
+// Inside your component:
+const bpmChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleBpmChange = useCallback((value: number) => {
+    // Clear any pending timeout
+    if (bpmChangeTimeoutRef.current) {
+      clearTimeout(bpmChangeTimeoutRef.current);
+    }
+    
+    // Set a new timeout
+    bpmChangeTimeoutRef.current = setTimeout(() => {
+      setBpmKnobValue(value);
+      bpmChangeTimeoutRef.current = null;
+    }, 1); // 1ms delay
+  }, []);
 
   return (
     <div className="text-select-none text-center mt-5">

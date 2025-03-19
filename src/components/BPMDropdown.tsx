@@ -172,12 +172,16 @@ export const BPMDropdown: FC<BPMDropdownProps> = ({ onBpmChange, currentBpm }) =
         
         {isDropdownOpen && renderDropdownOptions()}
         
-        <button 
-          onClick={() => setIsAddModalOpen(true)}
-          className="font-bold px-3 py-2 border rounded-md text-blue-500 hover:bg-blue-100 focus:outline-none"
-        >
-          +
-        </button>
+        { user && (
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="font-bold px-3 py-2 border rounded-md text-blue-500 hover:bg-blue-100 focus:outline-none"
+          >
+            +
+          </button>          
+        )
+        }
+
       </div>
       
       {isAddModalOpen && renderAddModal()}
